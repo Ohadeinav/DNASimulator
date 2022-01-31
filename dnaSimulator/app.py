@@ -6,7 +6,7 @@ import time
 from functools import partial
 import ast
 
-from PIL.ImageQt import ImageQt
+# from PIL.ImageQt import ImageQt
 from PyQt5 import QtGui
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPixmap
