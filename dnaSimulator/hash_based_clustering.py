@@ -201,3 +201,57 @@ class HashBasedCluster:
 
         os.remove(self.evyat_path)
         os.rename(temp_evyat_path, self.evyat_path)
+
+def comp_clusters(cluster1, cluster2, gamma):
+    """
+    compute the indicator condition that is a part of the
+    accuracy definition in the article section 2 definition 2.1
+    Args:
+        cluster1: cluster from the algorithm clustering
+        cluster2: cluster from the true clustering
+        gamma: threshold should be between 0.5 to 1
+
+    Returns: 1 if cluster1 is subset of cluster2
+             and the size of the Intersection between them is larger than gamma*|cluster2|
+             otherwise return 0.
+    """
+    # if gamma < 0.5 or gamma > 1:
+    #     print(f'gamma can only be value between 0.5 to 1. you gave gamma = {gamma}')
+    #     return 0
+    # if len(cluster1) < gamma * len(cluster2):
+    #     return 0
+    # for read1 in cluster1:
+    #     exist_in_cluster2 = False
+    #     for read2 in cluster2:
+    #         if read1 == read2:
+    #             exist_in_cluster2 = True
+    #             break
+    #     if not exist_in_cluster2:
+    #         # means that cluster1 is not a subset of cluster2
+    #         return 0
+    # return 1
+
+    # alternative implementation
+    if gamma < 0.5 or gamma > 1:
+        print(f'gamma can only be value between 0.5 to 1. you gave gamma = {gamma}')
+        return 0
+    if len(cluster1) < gamma * len(cluster2):
+        return 0
+    for read in cluster1:
+        if read not in cluster2:
+            return 0
+    return 1
+
+def calc_accuracy(algo_clustering, true_clustering, gamma):
+    if gamma < 0.5 or gamma > 1:
+        print(f'gamma can only be value between 0.5 to 1. you gave gamma = {gamma}')
+        return -1
+    accuracy = 0
+    for true_cluster in true_clustering:
+        for algo_cluster in algo_clustering:
+            if len(algo_cluster) >= 1:
+                res = comp_clusters(algo_cluster, true_cluster, gamma)
+                accuracy += res
+                if res == 1:
+                    break
+    return accuracy / len(true_clustering)
