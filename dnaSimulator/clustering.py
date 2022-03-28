@@ -111,10 +111,11 @@ def rand_perm(w):
     return ''.join(random.choice('ACGT') for _ in range(w))
 
 
-def gen_rand_input(strand_len, num_of_strands):
+def gen_rand_input(strand_len, num_of_strands, file_path = None):
     """
     Generate num_of_strands random strands each in strand_len length.
     Returns (list of this strands, string of all the strands).
+    optionally also write is to a given file.
     """
     strands = []
     res_str = ''
@@ -122,6 +123,9 @@ def gen_rand_input(strand_len, num_of_strands):
         strand = rand_perm(strand_len)
         res_str += strand + "\n"
         strands.append(strand)
+    if file_path is not None:
+        with open(file_path, 'w', newline='\n') as f:
+            f.write(res_str)
     return strands, res_str
 
 

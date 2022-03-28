@@ -25,7 +25,7 @@ def accuracies_cmp_aux(file_path):
 
 
 def test_gen_rand_input():
-    res, str0 = gen_rand_input(100, 5)
+    res, str0 = gen_rand_input(100, 5, "input/strand_in01.txt")
     for i in range(len(res)):
         print(f'strand {i}:')
         print(res[i])
