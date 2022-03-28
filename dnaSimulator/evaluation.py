@@ -3,7 +3,15 @@ from clustering import *
 from timeit import timeit
 
 
-def accuracies_cmp(file_path):
+def accuracies_cmp():
+    origin_path = "files/minion_idt/evyat0"
+    for i in range(0, 1):
+        path = origin_path + str(i) + ".txt"
+        print(f'file evyat0{i}:')
+        accuracies_cmp_aux(path)
+
+
+def accuracies_cmp_aux(file_path):
     clustering_info = ClusteringInfo(file_path=file_path)
     C = file_to_cluster(file_path)
     C_til_new = file_to_cluster(file_path.replace('evyat', 'temp_evyat'))
@@ -16,12 +24,18 @@ def accuracies_cmp(file_path):
         print(f'gamma: {gamma/100}, acc_new: {new_acc}, acc_old: {old_acc}')
 
 
+def test_gen_rand_input():
+    res, str0 = gen_rand_input(100, 5)
+    for i in range(len(res)):
+        print(f'strand {i}:')
+        print(res[i])
+    print("str:")
+    print(str0)
+
+
 def main():
-    origin_path = "files/minion_idt/evyat0"
-    for i in range(0, 1):
-        path = origin_path + str(i) + ".txt"
-        print(f'file evyat0{i}:')
-        accuracies_cmp(path)
+    # accuracies_cmp()
+    test_gen_rand_input()
 
 
 if __name__ == "__main__":

@@ -107,8 +107,22 @@ def ham_dis(x, y):
 
 
 def rand_perm(w):
-    """ return random DNA strand """
+    """ return random DNA strand of length w"""
     return ''.join(random.choice('ACGT') for _ in range(w))
+
+
+def gen_rand_input(strand_len, num_of_strands):
+    """
+    Generate num_of_strands random strands each in strand_len length.
+    Returns (list of this strands, string of all the strands).
+    """
+    strands = []
+    res_str = ''
+    for i in range(0, num_of_strands):
+        strand = rand_perm(strand_len)
+        res_str += strand + "\n"
+        strands.append(strand)
+    return strands, res_str
 
 
 def rep_find(inp, reads_leaders):
