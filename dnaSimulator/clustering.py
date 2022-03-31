@@ -84,6 +84,20 @@ def dna_str_to_decimal(st):
     return dec
 
 
+def decimal_to_dna_str(num):
+    """
+    return the value of a decimal number in base 4 in which:
+            A = 0 | C = 1 | G = 2 | T = 3
+    """
+    res = ''
+    map_dict = {0: "A", 1: "C", 2: "G", 3: "T"}
+    i = num
+    while i != 0:
+        res = map_dict[i % 4] + res
+        i = math.floor(i / 4)
+    return res
+
+
 def bin_sig(x, q):
     """ An implementation of the binary signature from the article section 3.3"""
     bs = [0] * (4 ** q)  # if bs[i] = 1 it means that there is at least 1 substring
@@ -111,7 +125,7 @@ def rand_perm(w):
     return ''.join(random.choice('ACGT') for _ in range(w))
 
 
-def gen_rand_input(strand_len, num_of_strands, file_path = None):
+def gen_rand_input(strand_len, num_of_strands, file_path=None):
     """
     Generate num_of_strands random strands each in strand_len length.
     Returns (list of this strands, string of all the strands).
@@ -193,7 +207,7 @@ def min_max(val1, val2):
 
 
 def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=Windows_size,
-                       similarity_threshold=Similarity_threshold):
+                       similarity_threshold=Similarity_threshold, index_size=0):
     """
     Implementation of the microsoft hash based clustering algorithm.
     | Args:
@@ -201,6 +215,7 @@ def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=
     |   number_of_steps: The number of iterations of the algorithm. Default is 220.
     |   windows_size: A parameter for calculate the binary signature. Default is 4.
     |   similarity_threshold: A bound for the algorithm. Default is 15.
+    |   index_size: the number of chars in each index. e.g. for AAA,AAC,AAG,AAT,.... the size is 3.
     Returns a clustering. A list of clusters, each cluster in a sorted list if all the cluster reads ids.
     """
     # reads_err = clustering_info.reads_err  # will have all the reads from the sequencing stage
@@ -269,10 +284,12 @@ def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=
                 if hash_C_til[i][1] == hash_C_til[i + 1][1]:
                     x = reads_err[hash_C_til[i][0]]
                     y = reads_err[hash_C_til[i + 1][0]]
-                    if ((ham_dis(bin_sig_arr[hash_C_til[i][0]], bin_sig_arr[hash_C_til[i + 1][0]]) <= th_low) or
+                    # (edit_dis(x[:5], y[:5]) <= 3) and
+                    if ((index_size == 0 or (edit_dis(x[:index_size], y[:index_size]) <= 3)) and
+                        ((ham_dis(bin_sig_arr[hash_C_til[i][0]], bin_sig_arr[hash_C_til[i + 1][0]]) <= th_low) or
                             ((ham_dis(bin_sig_arr[hash_C_til[i][0]],
                                            bin_sig_arr[hash_C_til[i + 1][0]]) <= th_high) and
-                             edit_dis(x, y) <= r)):
+                             edit_dis(x, y) <= r))):
                         cnt += 1
                         min_temp, max_temp = min_max(rep_find(hash_C_til[i][0], read_leaders),
                                                           rep_find(hash_C_til[i + 1][0], read_leaders))
