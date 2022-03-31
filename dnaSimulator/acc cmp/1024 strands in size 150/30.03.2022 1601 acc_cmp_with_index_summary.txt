@@ -1,0 +1,132 @@
+file00
+summary:
+elapsed time not indexed = 53735650100 ns = 53.7357 sec
+elapsed time indexed regular = 49032859500 ns = 49.0329 sec
+elapsed time indexed = 50602735200 ns = 50.6027 sec
+elapsed time not indexed - elapsed time indexed = 3132914900 ns = 3.1329 sec
+elapsed time indexed regular - elapsed time indexed = -1569875700 ns = -1.5699 sec
+improvement percentage with no index = 5.8302
+improvement percentage with index regular = -3.2017
+gamma not indexed - gamma indexed = [-0.01757812 -0.01757812 -0.01757812 -0.01757812 -0.01757812 -0.01757812
+ -0.01757812 -0.01757812 -0.01757812 -0.01660156]
+gamma indexed regular - gamma indexed = [0.         0.         0.         0.         0.         0.
+ 0.         0.         0.         0.00097656]
+
+file01
+summary:
+elapsed time not indexed = 53633827400 ns = 53.6338 sec
+elapsed time indexed regular = 81186102400 ns = 81.1861 sec
+elapsed time indexed = 72929159500 ns = 72.9292 sec
+elapsed time not indexed - elapsed time indexed = -19295332100 ns = -19.2953 sec
+elapsed time indexed regular - elapsed time indexed = 8256942900 ns = 8.2569 sec
+improvement percentage with no index = -35.9760
+improvement percentage with index regular = 10.1704
+gamma not indexed - gamma indexed = [-0.00976562 -0.00976562 -0.00976562 -0.00976562 -0.00976562 -0.00976562
+ -0.00976562 -0.00976562 -0.00976562 -0.00976562]
+gamma indexed regular - gamma indexed = [ 0.          0.          0.          0.          0.          0.
+  0.          0.          0.         -0.00097656]
+
+file02
+summary:
+elapsed time not indexed = 75939185600 ns = 75.9392 sec
+elapsed time indexed regular = 91109335900 ns = 91.1093 sec
+elapsed time indexed = 94968767000 ns = 94.9688 sec
+elapsed time not indexed - elapsed time indexed = -19029581400 ns = -19.0296 sec
+elapsed time indexed regular - elapsed time indexed = -3859431100 ns = -3.8594 sec
+improvement percentage with no index = -25.0590
+improvement percentage with index regular = -4.2360
+gamma not indexed - gamma indexed = [-0.0078125 -0.0078125 -0.0078125 -0.0078125 -0.0078125 -0.0078125
+ -0.0078125 -0.0078125 -0.0078125 -0.0078125]
+gamma indexed regular - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+
+file03
+summary:
+elapsed time not indexed = 117024299600 ns = 117.0243 sec
+elapsed time indexed regular = 134344808800 ns = 134.3448 sec
+elapsed time indexed = 137505688900 ns = 137.5057 sec
+elapsed time not indexed - elapsed time indexed = -20481389300 ns = -20.4814 sec
+elapsed time indexed regular - elapsed time indexed = -3160880100 ns = -3.1609 sec
+improvement percentage with no index = -17.5018
+improvement percentage with index regular = -2.3528
+gamma not indexed - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+gamma indexed regular - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+
+file04
+summary:
+elapsed time not indexed = 72412347600 ns = 72.4123 sec
+elapsed time indexed regular = 102233571400 ns = 102.2336 sec
+elapsed time indexed = 106786646400 ns = 106.7866 sec
+elapsed time not indexed - elapsed time indexed = -34374298800 ns = -34.3743 sec
+elapsed time indexed regular - elapsed time indexed = -4553075000 ns = -4.5531 sec
+improvement percentage with no index = -47.4702
+improvement percentage with index regular = -4.4536
+gamma not indexed - gamma indexed = [-0.00292969 -0.00292969 -0.00292969 -0.00292969 -0.00292969 -0.00292969
+ -0.00292969 -0.00292969 -0.00292969 -0.00292969]
+gamma indexed regular - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+
+file05
+summary:
+elapsed time not indexed = 55824218400 ns = 55.8242 sec
+elapsed time indexed regular = 300247087900 ns = 300.2471 sec
+elapsed time indexed = 299434588900 ns = 299.4346 sec
+elapsed time not indexed - elapsed time indexed = -243610370500 ns = -243.6104 sec
+elapsed time indexed regular - elapsed time indexed = 812499000 ns = 0.8125 sec
+improvement percentage with no index = -436.3883
+improvement percentage with index regular = 0.2706
+gamma not indexed - gamma indexed = [0.         0.         0.         0.         0.         0.
+ 0.         0.00097656 0.00097656 0.00195312]
+gamma indexed regular - gamma indexed = [0.         0.         0.         0.         0.         0.
+ 0.         0.00097656 0.00097656 0.00097656]
+
+file06
+summary:
+elapsed time not indexed = 70998551200 ns = 70.9986 sec
+elapsed time indexed regular = 55135101400 ns = 55.1351 sec
+elapsed time indexed = 57305184000 ns = 57.3052 sec
+elapsed time not indexed - elapsed time indexed = 13693367200 ns = 13.6934 sec
+elapsed time indexed regular - elapsed time indexed = -2170082600 ns = -2.1701 sec
+improvement percentage with no index = 19.2868
+improvement percentage with index regular = -3.9359
+gamma not indexed - gamma indexed = [-0.01269531 -0.01269531 -0.01269531 -0.01269531 -0.01269531 -0.01269531
+ -0.01269531 -0.01269531 -0.01269531 -0.01367188]
+gamma indexed regular - gamma indexed = [-0.01269531 -0.01269531 -0.01269531 -0.01269531 -0.01269531 -0.01269531
+ -0.01269531 -0.01269531 -0.01269531 -0.01269531]
+
+file07
+summary:
+elapsed time not indexed = 93224976000 ns = 93.2250 sec
+elapsed time indexed regular = 65211391100 ns = 65.2114 sec
+elapsed time indexed = 67283226400 ns = 67.2832 sec
+elapsed time not indexed - elapsed time indexed = 25941749600 ns = 25.9417 sec
+elapsed time indexed regular - elapsed time indexed = -2071835300 ns = -2.0718 sec
+improvement percentage with no index = 27.8270
+improvement percentage with index regular = -3.1771
+gamma not indexed - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+gamma indexed regular - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+
+file08
+summary:
+elapsed time not indexed = 58757874800 ns = 58.7579 sec
+elapsed time indexed regular = 132018409800 ns = 132.0184 sec
+elapsed time indexed = 115300026200 ns = 115.3000 sec
+elapsed time not indexed - elapsed time indexed = -56542151400 ns = -56.5422 sec
+elapsed time indexed regular - elapsed time indexed = 16718383600 ns = 16.7184 sec
+improvement percentage with no index = -96.2291
+improvement percentage with index regular = 12.6637
+gamma not indexed - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+gamma indexed regular - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+
+file09
+summary:
+elapsed time not indexed = 61204387200 ns = 61.2044 sec
+elapsed time indexed regular = 98792277600 ns = 98.7923 sec
+elapsed time indexed = 98875559200 ns = 98.8756 sec
+elapsed time not indexed - elapsed time indexed = -37671172000 ns = -37.6712 sec
+elapsed time indexed regular - elapsed time indexed = -83281600 ns = -0.0833 sec
+improvement percentage with no index = -61.5498
+improvement percentage with index regular = -0.0843
+gamma not indexed - gamma indexed = [-0.02246094 -0.02246094 -0.02246094 -0.02246094 -0.02246094 -0.02246094
+ -0.02246094 -0.02246094 -0.02246094 -0.02246094]
+gamma indexed regular - gamma indexed = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+
+it took 3128.4661788000003 sec to run this
