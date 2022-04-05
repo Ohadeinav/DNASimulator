@@ -206,8 +206,66 @@ def min_max(val1, val2):
     return min_val, max_val
 
 
+def condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, index_size=0):
+    return (((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low) or
+             ((ham_dis(bin_sig_arr[hash_C_til[id1][0]],
+                       bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_high) and
+              edit_dis(read1, read2) <= r)))
+
+
+def condition1(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, index_size):
+    if index_size == 0:
+        return condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r)
+    return ((index_size == 0 or (edit_dis(read1[:index_size], read2[:index_size]) <= 3)) and
+            ((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low) or
+             ((ham_dis(bin_sig_arr[hash_C_til[id1][0]],
+                       bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_high) and
+              edit_dis(read1, read2) <= r)))
+
+
+def condition2(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, index_size):
+    if index_size == 0:
+        return condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r)
+    index_ed = edit_dis(read1[:index_size], read2[:index_size])
+    th_low_new = th_low + (index_size - index_ed)
+    th_high_new = th_high + (index_size - index_ed)
+    return ((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low_new) or
+            ((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_high_new) and
+            edit_dis(read1, read2) <= r))
+
+
+def condition3(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, index_size):
+    if index_size == 0:
+        return condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r)
+    index_ed = edit_dis(read1[:index_size], read2[:index_size])
+    th_low_new = th_low - index_ed
+    th_high_new = th_high - index_ed
+    return ((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low_new) or
+            ((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_high_new) and
+            edit_dis(read1, read2) <= r))
+
+
+def condition4(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, index_size):
+    if index_size == 0:
+        return condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r)
+    index_ed = edit_dis(read1[:index_size], read2[:index_size])
+    th_low_new = th_low - index_ed
+    th_high_new = th_high - index_ed
+    if ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low_new:
+        return True
+    if ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_high_new:
+        data_ed = edit_dis(read1, read2)
+        score = alpha * index_ed + beta * data_ed
+        if score < threshold:
+            return True
+    return False
+
+
+
+
+
 def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=Windows_size,
-                       similarity_threshold=Similarity_threshold, index_size=0):
+                       similarity_threshold=Similarity_threshold, index_size=0, cond_func=condition0):
     """
     Implementation of the microsoft hash based clustering algorithm.
     | Args:
@@ -285,11 +343,12 @@ def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=
                     x = reads_err[hash_C_til[i][0]]
                     y = reads_err[hash_C_til[i + 1][0]]
                     # (edit_dis(x[:5], y[:5]) <= 3) and
-                    if ((index_size == 0 or (edit_dis(x[:index_size], y[:index_size]) <= 3)) and
-                        ((ham_dis(bin_sig_arr[hash_C_til[i][0]], bin_sig_arr[hash_C_til[i + 1][0]]) <= th_low) or
-                            ((ham_dis(bin_sig_arr[hash_C_til[i][0]],
-                                           bin_sig_arr[hash_C_til[i + 1][0]]) <= th_high) and
-                             edit_dis(x, y) <= r))):
+                    # if ((index_size == 0 or (edit_dis(x[:index_size], y[:index_size]) <= 3)) and
+                    #     ((ham_dis(bin_sig_arr[hash_C_til[i][0]], bin_sig_arr[hash_C_til[i + 1][0]]) <= th_low) or
+                    #         ((ham_dis(bin_sig_arr[hash_C_til[i][0]],
+                    #                        bin_sig_arr[hash_C_til[i + 1][0]]) <= th_high) and
+                    #          edit_dis(x, y) <= r))):
+                    if cond_func(bin_sig_arr, hash_C_til, i, x, y, th_low, th_high, r, index_size):
                         cnt += 1
                         min_temp, max_temp = min_max(rep_find(hash_C_til[i][0], read_leaders),
                                                           rep_find(hash_C_til[i + 1][0], read_leaders))

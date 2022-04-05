@@ -101,7 +101,7 @@ def test_time_functions():
 
 
 def test_time_and_accuracy_with_index():
-    origin_file_path = "files/minion_idt/3000 strands in size 150 with x1.5 errors and cluster avg of 40/evyat0.txt"
+    origin_file_path = "files/minion_idt/3000 strands in size 100 with x1.5 errors and cluster avg of 40/evyat0.txt"
     start = time.perf_counter_ns()
     for i in range(0, 10):
         acc_list = []
@@ -137,11 +137,11 @@ def test_time_and_accuracy_with_index():
             print(f'gamma: {gamma:0.4f}, acc_old: {old_acc:0.6f}')
 
         s3 = time.perf_counter_ns()
-        C_til_old_index = hash_based_cluster(clustering_info_index.reads_err, index_size=5)
+        C_til_old_index = hash_based_cluster(clustering_info_index.reads_err, index_size=5, cond_func=condition3)
         e3 = time.perf_counter_ns()
         elapsed_time_ns3 = e3 - s3
         elapsed_time_sec3 = elapsed_time_ns3 * math.pow(10, -9)
-        print(f'file0{i}_index_regular\nelapsed time: {elapsed_time_sec3:0.4f} sec')
+        print(f'file0{i}_index\nelapsed time: {elapsed_time_sec3:0.4f} sec')
         for gamma in gammas:
             old_acc = calc_acrcy(C_til_old_index, clustering_info_index.reads_err, clustering_info_index.C_dict
                                  , clustering_info_index.C_reps, gamma)
