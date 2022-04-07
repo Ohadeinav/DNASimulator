@@ -2,10 +2,12 @@ import argparse
 import os
 import shutil
 import threading
-
+import random
+from datetime import datetime
 from simulator import *
 import time
 import math
+# random.seed(datetime.now())
 
 Number_of_steps = 220
 Windows_size = 4
@@ -249,6 +251,17 @@ def condition4(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, i
     if index_size == 0:
         return condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r)
     index_ed = edit_dis(read1[:index_size], read2[:index_size])
+    th_low_new = th_low + (math.floor(index_size/2) - index_ed)
+    th_high_new = th_high - index_ed
+    return ((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low_new) or
+            ((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_high_new) and
+            edit_dis(read1, read2) <= r))
+
+
+def condition5(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, index_size):
+    if index_size == 0:
+        return condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r)
+    index_ed = edit_dis(read1[:index_size], read2[:index_size])
     th_low_new = th_low - index_ed
     th_high_new = th_high - index_ed
     if ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low_new:
@@ -259,9 +272,6 @@ def condition4(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, i
         if score < threshold:
             return True
     return False
-
-
-
 
 
 def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=Windows_size,
@@ -358,6 +368,168 @@ def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=
                         read_leaders[max_temp] = min_temp
 
     return [sorted(x) for x in list(C_til.values()) if x != []]
+
+
+def str_clustering_to_ids(cluster_info):
+    """
+    Make a the evyat file like the output of the algorithm.
+    | Args:
+    |   cluster_info: An instance of class ClusteringInfo
+    Return:
+        A list of clusters. Each cluster is a list of reads_ids
+    """
+    clustering = []
+    for i in range(len(cluster_info.original_strand_dict())):
+        clustering.append([])
+    for key, value in cluster_info.reads_err_original_strand_dict.items():
+        clustering[value].append(key)
+    return [sorted(cluster) for cluster in clustering]
+
+
+def find_unwanted_rebellious_reads(stats, gamma=0.5):
+    """
+    | Args:
+    |   stats:  {index of the algo cluster: value}
+    |           Where value is a dict:
+    |           {id_of_origin_strand: tuple
+    |           #element1: The ratio between the next two
+    |           #element2: Number of reads that originated from this origin strand
+    |           #element3: Size of the origin strand true cluster
+    |   gamma:  A param that tell what we consider as a rebellious_reads.
+    |           Default is 0.5.
+    Returns:
+        A dict similar to the arg stats. But contains only algo clusters that are considered rebellious_reads
+        and contains only the information about them.
+    """
+    unwanted_rebellious_reads = {}
+    for index, algo_cluster_stat in stats.items():
+        is_rebellious = False
+        if len(algo_cluster_stat.keys()) > 1:
+            temp = {}
+            for orig_cluster_id, stats in algo_cluster_stat.items():
+                # temp = {}
+                if stats[0] < gamma and stats[1] < 5:
+                    temp[orig_cluster_id] = stats
+                    is_rebellious = True
+            if is_rebellious:
+                unwanted_rebellious_reads[index] = temp
+    return unwanted_rebellious_reads
+
+
+def find_unwanted_singletons(stats, gamma=0.5):
+    """
+    | Args:
+    |   stats:  {index of the algo cluster: value}
+    |           Where value is a dict:
+    |           {id_of_origin_strand: tuple
+    |           #element1: The ratio between the next two
+    |           #element2: Number of reads that originated from this origin strand
+    |           #element3: Size of the origin strand true cluster
+    |   gamma:  A param that tell what we consider as a singleton.
+    |           Default is 0.5.
+    Returns:
+        A dict similar to the arg stats. But contains only algo clusters that are considered singletons.
+    """
+    unwanted_singletons = {}
+    for index, algo_cluster_stat in stats.items():
+        if len(algo_cluster_stat.keys()) == 1:
+            for orig_cluster_id, stats in algo_cluster_stat.items():
+                if stats[0] <= gamma and stats[1] == 1:
+                    unwanted_singletons[index] = algo_cluster_stat
+    return unwanted_singletons
+
+
+def find_unwanted_unions(stats, gamma=0.5):
+    """
+    | Args:
+    |   stats:  {index of the algo cluster: value}
+    |           Where value is a dict:
+    |           {id_of_origin_strand: tuple
+    |           #element1: The ratio between the next two
+    |           #element2: Number of reads that originated from this origin strand
+    |           #element3: Size of the origin strand true cluster
+    |   gamma:  A param that tell us how much we consider as a union between two clusters.
+    |           Default is 0.5.
+    Returns:
+        A dict similar to the arg stats. But contains only algo clusters that are unwanted unions.
+    """
+    unwanted_unions = {}
+    for index, algo_cluster_stat in stats.items():
+        if len(algo_cluster_stat.keys()) > 1:
+            count = 0
+            for orig_cluster_id, stats in algo_cluster_stat.items():
+                if stats[0] >= gamma:
+                    count += 1
+            if count >= 2:
+                unwanted_unions[index] = algo_cluster_stat
+    return unwanted_unions
+
+
+def find_clusters_stats(algo_clustering, orig_cluster_info):
+    """
+    Returns tuple.
+    The first element is a dict:
+    {index of the algo cluster: value}
+    Where value is a dict:
+    {id_of_origin_strand: tuple
+    #element1: The ratio between the next two
+    #element2: Number of reads that originated from this origin strand
+    #element3: Size of the origin strand true cluster
+
+    The second element is the same as the first except for the keys.
+    Now the first keys are id_of_origin_strand and the second is the index of the algo cluster.
+    | Args:
+    |   algo_clustering: The output of the hash based clustering algorithm - list of clusters.
+    |                    Each cluster is a list of reads ids.
+    |   orig_cluster_info: an object of class ClusteringInfo
+    """
+    clusters_sizes = {}
+    res_stat = {}
+    res_stat2 = {}
+    cluster_index_dict = find_clusters_origins(algo_clustering, orig_cluster_info)
+    for key, value in orig_cluster_info.clustering.items():
+        clusters_sizes[key] = len(value)
+    for index, cluster_stat in cluster_index_dict.items():
+        res_stat[index] = {}
+        for orig_id, algo_size in cluster_stat.items():
+            percentage = algo_size/clusters_sizes[orig_id]
+            res_stat[index][orig_id] = (percentage, algo_size, clusters_sizes[orig_id])
+            if orig_id in res_stat2:
+                res_stat2[orig_id][index] = (percentage, algo_size, clusters_sizes[orig_id])
+            else:
+                res_stat2[orig_id] = {index: (percentage, algo_size, clusters_sizes[orig_id])}
+    return res_stat, res_stat2
+
+
+def find_clusters_origins(algo_clustering, orig_cluster_info):
+    """
+    returns a dict:
+    {index of the algo cluster: value}
+    Where value is a dict:
+    {id_of_origin_strand: the number of reads that originated from
+    that original strand and in that specific algo cluster}
+
+    | Args:
+    |   algo_clustering: The output of the hash based clustering algorithm - list of clusters.
+    |                    Each cluster is a list of reads ids.
+    |   orig_cluster_info: an object of class ClusteringInfo
+    """
+    cluster_index_dict = {}
+    # "clean" the output of the algo_clustering
+    for index in range(len(algo_clustering)):
+        if len(algo_clustering[index]) == 0:
+            algo_clustering.pop(index)
+    # for each cluster in the algo output check how many reads
+    # are origin from the same strand.
+    for index in range(len(algo_clustering)):
+        cluster_index_dict[index] = {}
+        for read_id in algo_clustering[index]:
+            orig_id = orig_cluster_info.reads_err_original_strand_dict[read_id]
+            if orig_id in cluster_index_dict[index]:
+                cluster_index_dict[index][orig_id] += 1
+            else:
+                cluster_index_dict[index][orig_id] = 1
+    return cluster_index_dict
 
 
 def arrange_clustering(algo_clustering, orig_cluster_info):
