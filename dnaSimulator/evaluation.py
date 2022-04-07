@@ -4,6 +4,9 @@ import numpy as np
 from clustering import *
 import timeit
 import time
+import random
+from datetime import datetime
+# random.seed(datetime.now())
 
 
 def accuracies_cmp():
@@ -101,7 +104,7 @@ def test_time_functions():
 
 
 def test_time_and_accuracy_with_index():
-    origin_file_path = "files/minion_idt/3000 strands in size 100 with x1.5 errors and cluster avg of 40/evyat0.txt"
+    origin_file_path = "files/minion_idt/3000 strands in size 150 with x1.5 errors and cluster avg of 40/evyat0.txt"
     start = time.perf_counter_ns()
     for i in range(0, 10):
         acc_list = []
@@ -137,7 +140,7 @@ def test_time_and_accuracy_with_index():
             print(f'gamma: {gamma:0.4f}, acc_old: {old_acc:0.6f}')
 
         s3 = time.perf_counter_ns()
-        C_til_old_index = hash_based_cluster(clustering_info_index.reads_err, index_size=5, cond_func=condition3)
+        C_til_old_index = hash_based_cluster(clustering_info_index.reads_err, index_size=5, cond_func=condition4)
         e3 = time.perf_counter_ns()
         elapsed_time_ns3 = e3 - s3
         elapsed_time_sec3 = elapsed_time_ns3 * math.pow(10, -9)
@@ -169,6 +172,81 @@ def test_time_and_accuracy_with_index():
     print(f'it took {(end - start)*math.pow(10, -9)} sec to run this')
 
 
+def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=True):
+    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00.txt"
+    clustering_info = ClusteringInfo(file_path=file_path)
+    C_til = hash_based_cluster(clustering_info.reads_err)
+    stats1, stats2 = find_clusters_stats(C_til, clustering_info)
+    # for index, algo_cluster_stat in stats1.items():
+    #     if len(algo_cluster_stat.keys()) > 1:
+    #         print(f'algo_cluster_index = {index}:')
+    #         for orig_cluster_id, stats in algo_cluster_stat.items():
+    #             print(f'orig_cluster_id = {orig_cluster_id} ; size_in_algo_cluster = {stats[1]:0.1f} '
+    #                   f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
+    #         print('')
+
+    # for orig_id, algo_cluster_stat in stats2.items():
+    #     print(f'orig_cluster_id = {orig_id}:')
+    #     for algo_cluster_index, stats in algo_cluster_stat.items():
+    #         print(f'algo_cluster_index = {algo_cluster_index} ; size_in_algo_cluster = {stats[1]:0.1f} '
+    #               f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
+    #     print('')
+    str_summery = 'summery:\n'
+
+    # union:
+    unwanted_unions = find_unwanted_unions(stats1)
+    str_union = ''
+    for index, algo_cluster_stat in unwanted_unions.items():
+        str_union += f'algo_cluster_index = {index}:\n'
+        for orig_cluster_id, stats in algo_cluster_stat.items():
+            str_union += (f'orig_cluster_id = {orig_cluster_id} ; size_in_algo_cluster = {stats[1]:0.1f} '
+                          f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}\n')
+        str_union += '\n'
+    str_summery_temp = f'The total number of unwanted unions is {len(unwanted_unions.keys())}\n'
+    str_union += str_summery_temp
+    str_summery += str_summery_temp
+
+    # singletons:
+    unwanted_singletons = find_unwanted_singletons(stats1)
+    str_singletons = ''
+    for index, algo_cluster_stat in unwanted_singletons.items():
+        str_singletons += f'algo_cluster_index = {index}:\n'
+        for orig_cluster_id, stats in algo_cluster_stat.items():
+            str_singletons += f'orig_cluster_id = {orig_cluster_id} ; size_in_algo_cluster = {stats[1]:0.1f} ' \
+                              f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}\n'
+        str_singletons += '\n'
+    str_summery_temp = f'The total number of unwanted singletons is {len(unwanted_singletons.keys())}\n'
+    str_singletons += str_summery_temp
+    str_summery += str_summery_temp
+
+    # rebellious_reads
+    sum_of_rebellious_reads = 0
+    str_rebellious_reads = ''
+    unwanted_rebellious_reads = find_unwanted_rebellious_reads(stats1)
+    for index, algo_cluster_stat in unwanted_rebellious_reads.items():
+        str_rebellious_reads += f'algo_cluster_index = {index}:\n'
+        for orig_cluster_id, stats in algo_cluster_stat.items():
+            str_rebellious_reads += f'orig_cluster_id = {orig_cluster_id} ; size_in_algo_cluster = {stats[1]:0.1f} ' \
+                                    f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}\n'
+            sum_of_rebellious_reads += stats[1]
+        str_rebellious_reads += '\n'
+    num_of_clusters_with_rebellious_reads = len(unwanted_rebellious_reads.keys())
+    avg_of_rebellious_reads = sum_of_rebellious_reads/num_of_clusters_with_rebellious_reads
+    str_summery_temp = f'The total number of unwanted rebellious reads is {num_of_clusters_with_rebellious_reads}\n' \
+                       f'The avg size of unwanted rebellious reads in a cluster is {avg_of_rebellious_reads:0.4f}\n'
+    str_rebellious_reads += str_summery_temp
+    str_summery += str_summery_temp
+
+    if unions:
+        print(str_union)
+    if singletons:
+        print(str_singletons)
+    if rebellious_reads:
+        print(str_rebellious_reads)
+    if summery:
+        print(str_summery)
+
+
 def main():
     # accuracies_cmp()
     # test_gen_rand_input()
@@ -176,7 +254,8 @@ def main():
     # test_reg_index()
     # create_inputs(strand_len=150, num_of_strands=3000)
     # test_time_functions()
-    test_time_and_accuracy_with_index()
+    # test_time_and_accuracy_with_index()
+    test_stats(unions=False, singletons=False)
 
 
 if __name__ == "__main__":
