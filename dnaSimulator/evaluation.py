@@ -71,6 +71,19 @@ class RegIndex:
         return res
 
 
+class IndexStride(RegIndex):
+    def __init__(self, stride):
+        super.__init__()
+        self.stride = stride
+
+    def next(self):
+        res = decimal_to_dna_str(self.index)
+        self.index += self.stride
+        while len(res) != self.len:
+            res = 'A' + res
+        return res
+
+
 def test_decimal_to_dna_str():
     for i in range(20):
         print(f'{i} -> {decimal_to_dna_str(i)}')
@@ -173,10 +186,12 @@ def test_time_and_accuracy_with_index():
 
 
 def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=True):
-    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00.txt"
+    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
     clustering_info = ClusteringInfo(file_path=file_path)
-    C_til = hash_based_cluster(clustering_info.reads_err)
-    stats1, stats2 = find_clusters_stats(C_til, clustering_info)
+    C_til = hash_based_cluster(clustering_info.reads_err, index_size=6)
+    C_til1 = handle_singletons_with_index(C_til, clustering_info, index_size=6, threshold=10)
+    C_til2 = handle_singletons_with_index_ver2(C_til, clustering_info, index_size=6, threshold=10)
+    stats1, stats2 = find_clusters_stats(C_til1, clustering_info)
     # for index, algo_cluster_stat in stats1.items():
     #     if len(algo_cluster_stat.keys()) > 1:
     #         print(f'algo_cluster_index = {index}:')
@@ -186,11 +201,30 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
     #         print('')
 
     # for orig_id, algo_cluster_stat in stats2.items():
-    #     print(f'orig_cluster_id = {orig_id}:')
+    #     is_singleton = False
+    #     singleton = -1
     #     for algo_cluster_index, stats in algo_cluster_stat.items():
-    #         print(f'algo_cluster_index = {algo_cluster_index} ; size_in_algo_cluster = {stats[1]:0.1f} '
-    #               f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
-    #     print('')
+    #         if stats[1] == 1:
+    #             is_singleton = True
+    #             singleton = C_til[algo_cluster_index][0]
+    #             break
+    #     if is_singleton:
+    #         print(f'orig_cluster_id = {orig_id}:')
+    #         for algo_cluster_index, stats in algo_cluster_stat.items():
+    #             print(f'algo_cluster_index = {algo_cluster_index} ; size_in_algo_cluster = {stats[1]:0.1f} '
+    #                   f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
+    #         print('')
+    #         for algo_cluster_index, stats in algo_cluster_stat.items():
+    #             cluster = C_til[algo_cluster_index]
+    #             reads_err = clustering_info.reads_err
+    #             index_size = 6
+    #             representatives = random.sample(cluster, min([10, len(cluster)]))
+    #             identical_index_count = 0
+    #             for read in representatives:
+    #                 if reads_err[read][: index_size] == reads_err[singleton][: index_size]:
+    #                     identical_index_count += 1
+    #             print(f'{identical_index_count=}')
+    #         exit()
     str_summery = 'summery:\n'
 
     # union:
@@ -232,7 +266,7 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
         str_rebellious_reads += '\n'
     num_of_clusters_with_rebellious_reads = len(unwanted_rebellious_reads.keys())
     avg_of_rebellious_reads = sum_of_rebellious_reads/num_of_clusters_with_rebellious_reads
-    str_summery_temp = f'The total number of unwanted rebellious reads is {num_of_clusters_with_rebellious_reads}\n' \
+    str_summery_temp = f'The total number of clusters with unwanted rebellious reads is {num_of_clusters_with_rebellious_reads}\n' \
                        f'The avg size of unwanted rebellious reads in a cluster is {avg_of_rebellious_reads:0.4f}\n'
     str_rebellious_reads += str_summery_temp
     str_summery += str_summery_temp
@@ -244,7 +278,45 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
     if rebellious_reads:
         print(str_rebellious_reads)
     if summery:
+        acc1 = calc_acrcy(C_til1, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        acc2 = calc_acrcy(C_til2, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        str_summery += f'acc_ver_1 = {acc1:0.4f}\n'
+        str_summery += f'acc_ver_2 = {acc2:0.4f}\n'
         print(str_summery)
+
+
+def test_handle_singletons(index_size=6):
+    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
+    clustering_info = ClusteringInfo(file_path=file_path)
+    C_til = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
+    C_til = handle_singletons_with_index_ver2(C_til, clustering_info, index_size=index_size, threshold=10)
+    stats1, stats2 = find_clusters_stats(C_til, clustering_info)
+
+    for orig_id, algo_cluster_stat in stats2.items():
+        is_singleton = False
+        singleton = -1
+        for algo_cluster_index, stats in algo_cluster_stat.items():
+            if stats[1] == 1:
+                is_singleton = True
+                singleton = C_til[algo_cluster_index][0]
+                break
+        if is_singleton:
+            print(f'orig_cluster_id = {orig_id}:')
+            for algo_cluster_index, stats in algo_cluster_stat.items():
+                print(f'algo_cluster_index = {algo_cluster_index} ; size_in_algo_cluster = {stats[1]:0.1f} '
+                      f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
+            print('')
+            # for algo_cluster_index, stats in algo_cluster_stat.items():
+            #     cluster = C_til[algo_cluster_index]
+            #     reads_err = clustering_info.reads_err
+            #     representatives = random.sample(cluster, min([10, len(cluster)]))
+            #     identical_index_count = 0
+            #     for read in representatives:
+            #         print(reads_err[read][: index_size])
+            #         if reads_err[read][: index_size] == reads_err[singleton][: index_size]:
+            #             identical_index_count += 1
+            #     print(f'{identical_index_count=}')
+            # exit()
 
 
 def main():
@@ -256,6 +328,7 @@ def main():
     # test_time_functions()
     # test_time_and_accuracy_with_index()
     test_stats(unions=False, singletons=False)
+    # test_handle_singletons()
 
 
 if __name__ == "__main__":

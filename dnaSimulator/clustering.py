@@ -4,6 +4,9 @@ import shutil
 import threading
 import random
 from datetime import datetime
+
+import numpy as np
+
 from simulator import *
 import time
 import math
@@ -297,9 +300,9 @@ def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=
     q = windows_size
     # computing the binary signature for all the reads
     for i in range(0, len(reads_err)):
-        reads_err_ind[i] = (i, reads_err[i])
+        reads_err_ind[i] = (i, reads_err[i][index_size:])
         read_leaders[i] = i
-        bin_sig_arr.append(bin_sig(reads_err[i], q))
+        bin_sig_arr.append(bin_sig(reads_err[i][index_size:], q))
 
     C_til = create_clustering(read_leaders)  # short for C^(~) i.e. C tilda
     dist_arr = []
@@ -322,7 +325,7 @@ def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=
 
     r = similarity_threshold
     # set parameters from the article section 5.1:
-    w = math.ceil(math.log(len(reads_err[0]), 4))
+    w = math.ceil(math.log(len(reads_err[0][index_size:]), 4))
     l = math.ceil(math.log(len(reads_err), 4))
     for lcl_step in range(0, local_comm):
         # report_func(total_bar_size, (2 * tmp_bar) + lcl_step)
@@ -350,8 +353,8 @@ def hash_based_cluster(reads_err, number_of_steps=Number_of_steps, windows_size=
                 continue
             else:
                 if hash_C_til[i][1] == hash_C_til[i + 1][1]:
-                    x = reads_err[hash_C_til[i][0]]
-                    y = reads_err[hash_C_til[i + 1][0]]
+                    x = reads_err[hash_C_til[i][0]][index_size:]
+                    y = reads_err[hash_C_til[i + 1][0]][index_size:]
                     # (edit_dis(x[:5], y[:5]) <= 3) and
                     # if ((index_size == 0 or (edit_dis(x[:index_size], y[:index_size]) <= 3)) and
                     #     ((ham_dis(bin_sig_arr[hash_C_til[i][0]], bin_sig_arr[hash_C_til[i + 1][0]]) <= th_low) or
@@ -406,10 +409,10 @@ def find_unwanted_rebellious_reads(stats, gamma=0.5):
         is_rebellious = False
         if len(algo_cluster_stat.keys()) > 1:
             temp = {}
-            for orig_cluster_id, stats in algo_cluster_stat.items():
+            for orig_cluster_id, stats_ in algo_cluster_stat.items():
                 # temp = {}
-                if stats[0] < gamma and stats[1] < 5:
-                    temp[orig_cluster_id] = stats
+                if stats_[0] < gamma and stats_[1] < 5:
+                    temp[orig_cluster_id] = stats_
                     is_rebellious = True
             if is_rebellious:
                 unwanted_rebellious_reads[index] = temp
@@ -433,8 +436,8 @@ def find_unwanted_singletons(stats, gamma=0.5):
     unwanted_singletons = {}
     for index, algo_cluster_stat in stats.items():
         if len(algo_cluster_stat.keys()) == 1:
-            for orig_cluster_id, stats in algo_cluster_stat.items():
-                if stats[0] <= gamma and stats[1] == 1:
+            for orig_cluster_id, stats_ in algo_cluster_stat.items():
+                if stats_[0] <= gamma and stats_[1] == 1:
                     unwanted_singletons[index] = algo_cluster_stat
     return unwanted_singletons
 
@@ -457,8 +460,8 @@ def find_unwanted_unions(stats, gamma=0.5):
     for index, algo_cluster_stat in stats.items():
         if len(algo_cluster_stat.keys()) > 1:
             count = 0
-            for orig_cluster_id, stats in algo_cluster_stat.items():
-                if stats[0] >= gamma:
+            for orig_cluster_id, stats_ in algo_cluster_stat.items():
+                if stats_[0] >= gamma:
                     count += 1
             if count >= 2:
                 unwanted_unions[index] = algo_cluster_stat
@@ -530,6 +533,64 @@ def find_clusters_origins(algo_clustering, orig_cluster_info):
             else:
                 cluster_index_dict[index][orig_id] = 1
     return cluster_index_dict
+
+
+def handle_singletons_with_index(algo_clustering, orig_cluster_info, index_size, threshold=6):
+    reads_err = orig_cluster_info.reads_err
+    # find singletons
+    singletons = []
+    for cluster_id, cluster in enumerate(algo_clustering):
+        if len(cluster) == 1:
+            singletons.append((cluster[0], cluster_id))
+    # for each singleton search for his cluster's mates
+    for singleton, singleton_id in singletons:
+        largest_cluster = singleton_id
+        for cluster_id, cluster in enumerate(algo_clustering):
+            if cluster[0] != singleton:
+                representatives = random.sample(cluster, min([threshold, len(cluster)]))
+                identical_index_count = 0
+                for read in representatives:
+                    if reads_err[read][: index_size] == reads_err[singleton][: index_size]:
+                        identical_index_count += 1
+                if identical_index_count >= (1/2)*max([math.floor(len(representatives)), 1]):
+                    if len(algo_clustering[largest_cluster]) > len(algo_clustering[cluster_id]):
+                        largest_cluster = cluster_id
+        if largest_cluster != singleton_id:
+            algo_clustering[largest_cluster].extend(algo_clustering[singleton_id])
+            algo_clustering[singleton_id] = []
+    return [sorted(x) for x in algo_clustering if x != []]
+
+
+def handle_singletons_with_index_ver2(algo_clustering, orig_cluster_info, index_size, threshold=6):
+    reads_err = orig_cluster_info.reads_err
+    # find singletons
+    singletons = []
+    for cluster_id, cluster in enumerate(algo_clustering):
+        if len(cluster) == 1:
+            singletons.append((cluster[0], cluster_id))
+    # for each singleton search for his cluster's mates
+    for singleton, singleton_id in singletons:
+        largest_cluster = singleton_id
+        for cluster_id, cluster in enumerate(algo_clustering):
+            if len(cluster) >= len(algo_clustering[largest_cluster]):
+                true_index = []
+                if cluster[0] != singleton:
+                    representatives = random.sample(cluster, min([threshold, len(cluster)]))
+                    index_mat = np.array([list(reads_err[read][:index_size]) for read in representatives]).T
+                    for row in index_mat:
+                        row_list = list(row)
+                        true_index.append(max(row_list, key=row_list.count))
+                    str_index = ''.join(true_index)
+                    # orig_id = orig_cluster_info.reads_err_original_strand_dict[representatives[0]]
+                    # orig_index = orig_cluster_info.original_strand_dict[orig_id][: index_size]
+                    # print(f'{str_index=} ; {orig_index=}')
+                    ed = edit_dis(str_index, reads_err[singleton][: index_size])
+                    if ed <= 1:
+                        largest_cluster = cluster_id
+        if largest_cluster != singleton_id:
+            algo_clustering[largest_cluster].extend(algo_clustering[singleton_id])
+            algo_clustering[singleton_id] = []
+    return [sorted(x) for x in algo_clustering if x != []]
 
 
 def arrange_clustering(algo_clustering, orig_cluster_info):
