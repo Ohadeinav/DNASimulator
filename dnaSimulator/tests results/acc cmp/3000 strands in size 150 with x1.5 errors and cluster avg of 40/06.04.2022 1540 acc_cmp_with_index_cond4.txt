@@ -1,0 +1,361 @@
+file00
+elapsed time: 30.3840 sec
+gamma: 0.6000, acc_old: 0.950667
+gamma: 0.7000, acc_old: 0.950333
+gamma: 0.8000, acc_old: 0.949000
+gamma: 0.9000, acc_old: 0.946333
+gamma: 0.9500, acc_old: 0.938667
+gamma: 0.9900, acc_old: 0.908333
+file00_index_regular
+elapsed time: 32.5234 sec
+gamma: 0.6000, acc_old: 0.967667
+gamma: 0.7000, acc_old: 0.967333
+gamma: 0.8000, acc_old: 0.967000
+gamma: 0.9000, acc_old: 0.964667
+gamma: 0.9500, acc_old: 0.958000
+gamma: 0.9900, acc_old: 0.941000
+file00_index
+elapsed time: 32.9045 sec
+gamma: 0.6000, acc_old: 0.974333
+gamma: 0.7000, acc_old: 0.974000
+gamma: 0.8000, acc_old: 0.973333
+gamma: 0.9000, acc_old: 0.971667
+gamma: 0.9500, acc_old: 0.963667
+gamma: 0.9900, acc_old: 0.945667
+file00
+summary:
+elapsed time not indexed     = 30.3840 sec
+elapsed time indexed regular = 32.5234 sec
+elapsed time indexed         = 32.9045 sec
+elapsed time not indexed - elapsed time indexed = -2.5204 sec
+elapsed time indexed regular - elapsed time indexed = -0.3811 sec
+improvement percentage with no index = -8.2952
+improvement percentage with index regular = -1.1717
+gamma not indexed - gamma indexed = [-0.02366667 -0.02366667 -0.02433333 -0.02533333 -0.025      -0.03733333]
+gamma indexed regular - gamma indexed = [-0.00666667 -0.00666667 -0.00633333 -0.007      -0.00566667 -0.00466667]
+
+file01
+elapsed time: 30.6566 sec
+gamma: 0.6000, acc_old: 0.972000
+gamma: 0.7000, acc_old: 0.971000
+gamma: 0.8000, acc_old: 0.971000
+gamma: 0.9000, acc_old: 0.968333
+gamma: 0.9500, acc_old: 0.963667
+gamma: 0.9900, acc_old: 0.945667
+file01_index_regular
+elapsed time: 32.3193 sec
+gamma: 0.6000, acc_old: 0.974333
+gamma: 0.7000, acc_old: 0.974000
+gamma: 0.8000, acc_old: 0.973000
+gamma: 0.9000, acc_old: 0.971333
+gamma: 0.9500, acc_old: 0.966333
+gamma: 0.9900, acc_old: 0.951000
+file01_index
+elapsed time: 32.4433 sec
+gamma: 0.6000, acc_old: 0.979333
+gamma: 0.7000, acc_old: 0.979000
+gamma: 0.8000, acc_old: 0.978667
+gamma: 0.9000, acc_old: 0.977000
+gamma: 0.9500, acc_old: 0.972667
+gamma: 0.9900, acc_old: 0.957000
+file01
+summary:
+elapsed time not indexed     = 30.6566 sec
+elapsed time indexed regular = 32.3193 sec
+elapsed time indexed         = 32.4433 sec
+elapsed time not indexed - elapsed time indexed = -1.7867 sec
+elapsed time indexed regular - elapsed time indexed = -0.1240 sec
+improvement percentage with no index = -5.8282
+improvement percentage with index regular = -0.3836
+gamma not indexed - gamma indexed = [-0.00733333 -0.008      -0.00766667 -0.00866667 -0.009      -0.01133333]
+gamma indexed regular - gamma indexed = [-0.005      -0.005      -0.00566667 -0.00566667 -0.00633333 -0.006     ]
+
+file02
+elapsed time: 58.5421 sec
+gamma: 0.6000, acc_old: 0.985333
+gamma: 0.7000, acc_old: 0.984667
+gamma: 0.8000, acc_old: 0.984000
+gamma: 0.9000, acc_old: 0.976667
+gamma: 0.9500, acc_old: 0.968333
+gamma: 0.9900, acc_old: 0.922333
+file02_index_regular
+elapsed time: 32.8277 sec
+gamma: 0.6000, acc_old: 0.951667
+gamma: 0.7000, acc_old: 0.951000
+gamma: 0.8000, acc_old: 0.951000
+gamma: 0.9000, acc_old: 0.947333
+gamma: 0.9500, acc_old: 0.942000
+gamma: 0.9900, acc_old: 0.922333
+file02_index
+elapsed time: 37.9661 sec
+gamma: 0.6000, acc_old: 0.969333
+gamma: 0.7000, acc_old: 0.969000
+gamma: 0.8000, acc_old: 0.968333
+gamma: 0.9000, acc_old: 0.965667
+gamma: 0.9500, acc_old: 0.960667
+gamma: 0.9900, acc_old: 0.943333
+file02
+summary:
+elapsed time not indexed     = 58.5421 sec
+elapsed time indexed regular = 32.8277 sec
+elapsed time indexed         = 37.9661 sec
+elapsed time not indexed - elapsed time indexed = 20.5760 sec
+elapsed time indexed regular - elapsed time indexed = -5.1384 sec
+improvement percentage with no index = 35.1473
+improvement percentage with index regular = -15.6528
+gamma not indexed - gamma indexed = [ 0.016       0.01566667  0.01566667  0.011       0.00766667 -0.021     ]
+gamma indexed regular - gamma indexed = [-0.01766667 -0.018      -0.01733333 -0.01833333 -0.01866667 -0.021     ]
+
+file03
+elapsed time: 38.8981 sec
+gamma: 0.6000, acc_old: 0.952000
+gamma: 0.7000, acc_old: 0.951333
+gamma: 0.8000, acc_old: 0.949667
+gamma: 0.9000, acc_old: 0.949000
+gamma: 0.9500, acc_old: 0.944000
+gamma: 0.9900, acc_old: 0.921000
+file03_index_regular
+elapsed time: 38.4282 sec
+gamma: 0.6000, acc_old: 0.956333
+gamma: 0.7000, acc_old: 0.956333
+gamma: 0.8000, acc_old: 0.955667
+gamma: 0.9000, acc_old: 0.952667
+gamma: 0.9500, acc_old: 0.947000
+gamma: 0.9900, acc_old: 0.924333
+file03_index
+elapsed time: 38.1486 sec
+gamma: 0.6000, acc_old: 0.966000
+gamma: 0.7000, acc_old: 0.965000
+gamma: 0.8000, acc_old: 0.964000
+gamma: 0.9000, acc_old: 0.962000
+gamma: 0.9500, acc_old: 0.955667
+gamma: 0.9900, acc_old: 0.937667
+file03
+summary:
+elapsed time not indexed     = 38.8981 sec
+elapsed time indexed regular = 38.4282 sec
+elapsed time indexed         = 38.1486 sec
+elapsed time not indexed - elapsed time indexed = 0.7494 sec
+elapsed time indexed regular - elapsed time indexed = 0.2795 sec
+improvement percentage with no index = 1.9267
+improvement percentage with index regular = 0.7274
+gamma not indexed - gamma indexed = [-0.014      -0.01366667 -0.01433333 -0.013      -0.01166667 -0.01666667]
+gamma indexed regular - gamma indexed = [-0.00966667 -0.00866667 -0.00833333 -0.00933333 -0.00866667 -0.01333333]
+
+file04
+elapsed time: 36.8592 sec
+gamma: 0.6000, acc_old: 0.970667
+gamma: 0.7000, acc_old: 0.970000
+gamma: 0.8000, acc_old: 0.969667
+gamma: 0.9000, acc_old: 0.968333
+gamma: 0.9500, acc_old: 0.962333
+gamma: 0.9900, acc_old: 0.939333
+file04_index_regular
+elapsed time: 726.3111 sec
+gamma: 0.6000, acc_old: 0.026333
+gamma: 0.7000, acc_old: 0.024333
+gamma: 0.8000, acc_old: 0.024333
+gamma: 0.9000, acc_old: 0.024000
+gamma: 0.9500, acc_old: 0.024000
+gamma: 0.9900, acc_old: 0.024000
+file04_index
+elapsed time: 342.2255 sec
+gamma: 0.6000, acc_old: 0.026333
+gamma: 0.7000, acc_old: 0.024667
+gamma: 0.8000, acc_old: 0.024333
+gamma: 0.9000, acc_old: 0.024000
+gamma: 0.9500, acc_old: 0.024000
+gamma: 0.9900, acc_old: 0.024000
+file04
+summary:
+elapsed time not indexed     = 36.8592 sec
+elapsed time indexed regular = 726.3111 sec
+elapsed time indexed         = 342.2255 sec
+elapsed time not indexed - elapsed time indexed = -305.3663 sec
+elapsed time indexed regular - elapsed time indexed = 384.0856 sec
+improvement percentage with no index = -828.4681
+improvement percentage with index regular = 52.8817
+gamma not indexed - gamma indexed = [0.94433333 0.94533333 0.94533333 0.94433333 0.93833333 0.91533333]
+gamma indexed regular - gamma indexed = [ 0.         -0.00033333  0.          0.          0.          0.        ]
+
+file05
+elapsed time: 37.9058 sec
+gamma: 0.6000, acc_old: 0.946667
+gamma: 0.7000, acc_old: 0.946000
+gamma: 0.8000, acc_old: 0.945333
+gamma: 0.9000, acc_old: 0.943000
+gamma: 0.9500, acc_old: 0.936333
+gamma: 0.9900, acc_old: 0.911000
+file05_index_regular
+elapsed time: 38.1460 sec
+gamma: 0.6000, acc_old: 0.964667
+gamma: 0.7000, acc_old: 0.963667
+gamma: 0.8000, acc_old: 0.963000
+gamma: 0.9000, acc_old: 0.960333
+gamma: 0.9500, acc_old: 0.954000
+gamma: 0.9900, acc_old: 0.931333
+file05_index
+elapsed time: 38.4466 sec
+gamma: 0.6000, acc_old: 0.973667
+gamma: 0.7000, acc_old: 0.973000
+gamma: 0.8000, acc_old: 0.973000
+gamma: 0.9000, acc_old: 0.970667
+gamma: 0.9500, acc_old: 0.967333
+gamma: 0.9900, acc_old: 0.949333
+file05
+summary:
+elapsed time not indexed     = 37.9058 sec
+elapsed time indexed regular = 38.1460 sec
+elapsed time indexed         = 38.4466 sec
+elapsed time not indexed - elapsed time indexed = -0.5408 sec
+elapsed time indexed regular - elapsed time indexed = -0.3006 sec
+improvement percentage with no index = -1.4268
+improvement percentage with index regular = -0.7880
+gamma not indexed - gamma indexed = [-0.027      -0.027      -0.02766667 -0.02766667 -0.031      -0.03833333]
+gamma indexed regular - gamma indexed = [-0.009      -0.00933333 -0.01       -0.01033333 -0.01333333 -0.018     ]
+
+file06
+elapsed time: 37.8974 sec
+gamma: 0.6000, acc_old: 0.956000
+gamma: 0.7000, acc_old: 0.954333
+gamma: 0.8000, acc_old: 0.953000
+gamma: 0.9000, acc_old: 0.949333
+gamma: 0.9500, acc_old: 0.941000
+gamma: 0.9900, acc_old: 0.912000
+file06_index_regular
+elapsed time: 37.7414 sec
+gamma: 0.6000, acc_old: 0.966000
+gamma: 0.7000, acc_old: 0.965333
+gamma: 0.8000, acc_old: 0.965000
+gamma: 0.9000, acc_old: 0.963000
+gamma: 0.9500, acc_old: 0.956667
+gamma: 0.9900, acc_old: 0.939000
+file06_index
+elapsed time: 38.3542 sec
+gamma: 0.6000, acc_old: 0.976000
+gamma: 0.7000, acc_old: 0.975333
+gamma: 0.8000, acc_old: 0.975000
+gamma: 0.9000, acc_old: 0.973333
+gamma: 0.9500, acc_old: 0.967667
+gamma: 0.9900, acc_old: 0.954333
+file06
+summary:
+elapsed time not indexed     = 37.8974 sec
+elapsed time indexed regular = 37.7414 sec
+elapsed time indexed         = 38.3542 sec
+elapsed time not indexed - elapsed time indexed = -0.4568 sec
+elapsed time indexed regular - elapsed time indexed = -0.6128 sec
+improvement percentage with no index = -1.2053
+improvement percentage with index regular = -1.6236
+gamma not indexed - gamma indexed = [-0.02       -0.021      -0.022      -0.024      -0.02666667 -0.04233333]
+gamma indexed regular - gamma indexed = [-0.01       -0.01       -0.01       -0.01033333 -0.011      -0.01533333]
+
+file07
+elapsed time: 228.6857 sec
+gamma: 0.6000, acc_old: 0.988333
+gamma: 0.7000, acc_old: 0.985000
+gamma: 0.8000, acc_old: 0.981000
+gamma: 0.9000, acc_old: 0.968333
+gamma: 0.9500, acc_old: 0.933000
+gamma: 0.9900, acc_old: 0.827000
+file07_index_regular
+elapsed time: 38.8686 sec
+gamma: 0.6000, acc_old: 0.961333
+gamma: 0.7000, acc_old: 0.961000
+gamma: 0.8000, acc_old: 0.960333
+gamma: 0.9000, acc_old: 0.959333
+gamma: 0.9500, acc_old: 0.953667
+gamma: 0.9900, acc_old: 0.936667
+file07_index
+elapsed time: 38.5994 sec
+gamma: 0.6000, acc_old: 0.975667
+gamma: 0.7000, acc_old: 0.975000
+gamma: 0.8000, acc_old: 0.974333
+gamma: 0.9000, acc_old: 0.971667
+gamma: 0.9500, acc_old: 0.965667
+gamma: 0.9900, acc_old: 0.946333
+file07
+summary:
+elapsed time not indexed     = 228.6857 sec
+elapsed time indexed regular = 38.8686 sec
+elapsed time indexed         = 38.5994 sec
+elapsed time not indexed - elapsed time indexed = 190.0864 sec
+elapsed time indexed regular - elapsed time indexed = 0.2692 sec
+improvement percentage with no index = 83.1212
+improvement percentage with index regular = 0.6927
+gamma not indexed - gamma indexed = [ 0.01266667  0.01        0.00666667 -0.00333333 -0.03266667 -0.11933333]
+gamma indexed regular - gamma indexed = [-0.01433333 -0.014      -0.014      -0.01233333 -0.012      -0.00966667]
+
+file08
+elapsed time: 37.3513 sec
+gamma: 0.6000, acc_old: 0.964667
+gamma: 0.7000, acc_old: 0.963667
+gamma: 0.8000, acc_old: 0.962667
+gamma: 0.9000, acc_old: 0.959333
+gamma: 0.9500, acc_old: 0.953667
+gamma: 0.9900, acc_old: 0.932000
+file08_index_regular
+elapsed time: 38.8771 sec
+gamma: 0.6000, acc_old: 0.962333
+gamma: 0.7000, acc_old: 0.962000
+gamma: 0.8000, acc_old: 0.962000
+gamma: 0.9000, acc_old: 0.959333
+gamma: 0.9500, acc_old: 0.953333
+gamma: 0.9900, acc_old: 0.933333
+file08_index
+elapsed time: 38.4878 sec
+gamma: 0.6000, acc_old: 0.970333
+gamma: 0.7000, acc_old: 0.970000
+gamma: 0.8000, acc_old: 0.969000
+gamma: 0.9000, acc_old: 0.966333
+gamma: 0.9500, acc_old: 0.961333
+gamma: 0.9900, acc_old: 0.941333
+file08
+summary:
+elapsed time not indexed     = 37.3513 sec
+elapsed time indexed regular = 38.8771 sec
+elapsed time indexed         = 38.4878 sec
+elapsed time not indexed - elapsed time indexed = -1.1365 sec
+elapsed time indexed regular - elapsed time indexed = 0.3893 sec
+improvement percentage with no index = -3.0428
+improvement percentage with index regular = 1.0013
+gamma not indexed - gamma indexed = [-0.00566667 -0.00633333 -0.00633333 -0.007      -0.00766667 -0.00933333]
+gamma indexed regular - gamma indexed = [-0.008 -0.008 -0.007 -0.007 -0.008 -0.008]
+
+file09
+elapsed time: 37.4974 sec
+gamma: 0.6000, acc_old: 0.969000
+gamma: 0.7000, acc_old: 0.968667
+gamma: 0.8000, acc_old: 0.968000
+gamma: 0.9000, acc_old: 0.963667
+gamma: 0.9500, acc_old: 0.954000
+gamma: 0.9900, acc_old: 0.938333
+file09_index_regular
+elapsed time: 217.2553 sec
+gamma: 0.6000, acc_old: 0.981000
+gamma: 0.7000, acc_old: 0.972667
+gamma: 0.8000, acc_old: 0.966000
+gamma: 0.9000, acc_old: 0.930667
+gamma: 0.9500, acc_old: 0.836000
+gamma: 0.9900, acc_old: 0.654000
+file09_index
+elapsed time: 99.1548 sec
+gamma: 0.6000, acc_old: 0.982667
+gamma: 0.7000, acc_old: 0.975000
+gamma: 0.8000, acc_old: 0.968333
+gamma: 0.9000, acc_old: 0.930667
+gamma: 0.9500, acc_old: 0.853000
+gamma: 0.9900, acc_old: 0.673667
+file09
+summary:
+elapsed time not indexed     = 37.4974 sec
+elapsed time indexed regular = 217.2553 sec
+elapsed time indexed         = 99.1548 sec
+elapsed time not indexed - elapsed time indexed = -61.6574 sec
+elapsed time indexed regular - elapsed time indexed = 118.1005 sec
+improvement percentage with no index = -164.4309
+improvement percentage with index regular = 54.3602
+gamma not indexed - gamma indexed = [-0.01366667 -0.00633333 -0.00033333  0.033       0.101       0.26466667]
+gamma indexed regular - gamma indexed = [-0.00166667 -0.00233333 -0.00233333  0.         -0.017      -0.01966667]
+
+it took 2569.7948911000003 sec to run this

@@ -1,0 +1,49 @@
+edit_dist <= 2:
+    summery:
+    The total number of unwanted unions is 33
+    The total number of unwanted singletons is 479
+    The total number of clusters with unwanted rebellious reads is 103
+    The avg size of unwanted rebellious reads in a cluster is 1.2621
+
+    acc_ver_0 = 0.7410
+
+    summery:
+    The total number of unwanted unions is 33
+    The total number of unwanted singletons is 479
+    The total number of clusters with unwanted rebellious reads is 103
+    The avg size of unwanted rebellious reads in a cluster is 1.2621
+
+    acc_ver_1 = 0.7410
+
+    summery:
+    The total number of unwanted unions is 96
+    The total number of unwanted singletons is 82
+    The total number of clusters with unwanted rebellious reads is 374
+    The avg size of unwanted rebellious reads in a cluster is 1.2513
+
+    acc_ver_2 = 0.6547
+
+edit_dist <= 1:
+    summery:
+    The total number of unwanted unions is 40
+    The total number of unwanted singletons is 394
+    The total number of clusters with unwanted rebellious reads is 95
+    The avg size of unwanted rebellious reads in a cluster is 1.4842
+
+    acc_ver_0 = 0.7620
+
+    summery:
+    The total number of unwanted unions is 40
+    The total number of unwanted singletons is 394
+    The total number of clusters with unwanted rebellious reads is 95
+    The avg size of unwanted rebellious reads in a cluster is 1.4842
+
+    acc_ver_1 = 0.7620
+
+    summery:
+    The total number of unwanted unions is 59
+    The total number of unwanted singletons is 288
+    The total number of clusters with unwanted rebellious reads is 174
+    The avg size of unwanted rebellious reads in a cluster is 1.3506
+
+    acc_ver_2 = 0.7360
