@@ -1,3 +1,4 @@
+import copy
 import math
 
 import numpy as np
@@ -185,46 +186,53 @@ def test_time_and_accuracy_with_index():
     print(f'it took {(end - start)*math.pow(10, -9)} sec to run this')
 
 
-def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=True):
-    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
-    clustering_info = ClusteringInfo(file_path=file_path)
-    C_til = hash_based_cluster(clustering_info.reads_err, index_size=6)
-    C_til1 = handle_singletons_with_index(C_til, clustering_info, index_size=6, threshold=10)
-    C_til2 = handle_singletons_with_index_ver2(C_til, clustering_info, index_size=6, threshold=10)
-    stats1, stats2 = find_clusters_stats(C_til1, clustering_info)
-    # for index, algo_cluster_stat in stats1.items():
-    #     if len(algo_cluster_stat.keys()) > 1:
-    #         print(f'algo_cluster_index = {index}:')
-    #         for orig_cluster_id, stats in algo_cluster_stat.items():
-    #             print(f'orig_cluster_id = {orig_cluster_id} ; size_in_algo_cluster = {stats[1]:0.1f} '
-    #                   f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
-    #         print('')
+def algo_clustering_to_file_aux(input_path, index_size):
+    input_file_name = input_path[input_path.rfind("/"):]
+    output_path = "files/minion_idt/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
+    clustering_info = ClusteringInfo(file_path=input_path)
+    C_til = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
+    print(C_til[0])
+    with open(output_path, 'w', newline='\n') as f:
+        for cluster in C_til:
+            for read_id in cluster:
+                f.write(f"{read_id}\n")
+            f.write("***\n")
 
-    # for orig_id, algo_cluster_stat in stats2.items():
-    #     is_singleton = False
-    #     singleton = -1
-    #     for algo_cluster_index, stats in algo_cluster_stat.items():
-    #         if stats[1] == 1:
-    #             is_singleton = True
-    #             singleton = C_til[algo_cluster_index][0]
-    #             break
-    #     if is_singleton:
-    #         print(f'orig_cluster_id = {orig_id}:')
-    #         for algo_cluster_index, stats in algo_cluster_stat.items():
-    #             print(f'algo_cluster_index = {algo_cluster_index} ; size_in_algo_cluster = {stats[1]:0.1f} '
-    #                   f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
-    #         print('')
-    #         for algo_cluster_index, stats in algo_cluster_stat.items():
-    #             cluster = C_til[algo_cluster_index]
-    #             reads_err = clustering_info.reads_err
-    #             index_size = 6
-    #             representatives = random.sample(cluster, min([10, len(cluster)]))
-    #             identical_index_count = 0
-    #             for read in representatives:
-    #                 if reads_err[read][: index_size] == reads_err[singleton][: index_size]:
-    #                     identical_index_count += 1
-    #             print(f'{identical_index_count=}')
-    #         exit()
+
+def algo_clustering_to_file(index_size):
+    input_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat0_index.txt"
+    for i in range(10):
+        if i != 4:
+            curr_input_path = input_path.replace("_index.txt", f"{i}_index.txt")
+            algo_clustering_to_file_aux(curr_input_path, index_size)
+
+
+def file_to_algo_clustering(path):
+    clustering = []
+    cluster_id = 0
+    clustering.append([])
+    with open(path, 'r') as f:
+        line = f.readline().strip()
+        while line:
+            if line[0] != '*':
+                clustering[cluster_id].append(int(line))
+                line = f.readline()
+            else:
+                line = f.readline().strip()
+                if line:  # means new cluster
+                    clustering.append([])
+                    cluster_id += 1
+    return clustering
+
+
+def test_file_to_algo_clustering():
+    path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
+    clustering = file_to_algo_clustering(path)
+    print(f'{clustering[0]=}')
+    print(f'{clustering[-1]=}')
+
+
+def stats_to_str_dict(stats1):
     str_summery = 'summery:\n'
 
     # union:
@@ -265,58 +273,158 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
             sum_of_rebellious_reads += stats[1]
         str_rebellious_reads += '\n'
     num_of_clusters_with_rebellious_reads = len(unwanted_rebellious_reads.keys())
-    avg_of_rebellious_reads = sum_of_rebellious_reads/num_of_clusters_with_rebellious_reads
+    avg_of_rebellious_reads = sum_of_rebellious_reads / num_of_clusters_with_rebellious_reads
     str_summery_temp = f'The total number of clusters with unwanted rebellious reads is {num_of_clusters_with_rebellious_reads}\n' \
                        f'The avg size of unwanted rebellious reads in a cluster is {avg_of_rebellious_reads:0.4f}\n'
     str_rebellious_reads += str_summery_temp
     str_summery += str_summery_temp
+    return {'summery': str_summery, 'unions': str_union, 'singletons': str_singletons,
+            'rebellious_reads': str_rebellious_reads}
+
+
+def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=True, file_path=None):
+    # file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
+    if file_path is None:
+        file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
+        algo_result_path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
+    clustering_info = ClusteringInfo(file_path=file_path)
+    C_til = file_to_algo_clustering(algo_result_path)
+    # C_til1 = handle_singletons_with_index(copy.deepcopy(C_til), clustering_info, index_size=6, threshold=100)
+    C_til2 = handle_singletons_with_index_ver2(copy.deepcopy(C_til), clustering_info, index_size=6, threshold=100)
+    # C_til3 = handle_singletons_with_index_ver3(copy.deepcopy(C_til), clustering_info, index_size=6, threshold=100)
+
+
+    stats_ver_0 = stats_to_str_dict(find_clusters_stats(C_til, clustering_info)[0])
+    # stats_ver_1 = stats_to_str_dict(find_clusters_stats(C_til1, clustering_info)[0])
+    stats_ver_2 = stats_to_str_dict(find_clusters_stats(C_til2, clustering_info)[0])
+    # stats_ver_3 = stats_to_str_dict(find_clusters_stats(C_til3, clustering_info)[0])
 
     if unions:
-        print(str_union)
+        print(stats_ver_0['unions'])
     if singletons:
-        print(str_singletons)
+        print(stats_ver_0['singletons'])
     if rebellious_reads:
-        print(str_rebellious_reads)
+        print(stats_ver_0['rebellious_reads'])
     if summery:
-        acc1 = calc_acrcy(C_til1, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        acc0 = calc_acrcy(C_til, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        # acc1 = calc_acrcy(C_til1, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
         acc2 = calc_acrcy(C_til2, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        str_summery += f'acc_ver_1 = {acc1:0.4f}\n'
-        str_summery += f'acc_ver_2 = {acc2:0.4f}\n'
-        print(str_summery)
+        # acc3 = calc_acrcy(C_til3, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        print(stats_ver_0['summery'])
+        print(f'acc_ver_0 = {acc0:0.4f}\n')
+        # print(stats_ver_1['summery'])
+        # print(f'acc_ver_1 = {acc1:0.4f}\n')
+        print(stats_ver_2['summery'])
+        print(f'acc_ver_2 = {acc2:0.4f}\n')
+        # print(stats_ver_3['summery'])
+        # print(f'acc_ver_3 = {acc3:0.4f}\n')
 
 
 def test_handle_singletons(index_size=6):
-    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
-    clustering_info = ClusteringInfo(file_path=file_path)
-    C_til = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
-    C_til = handle_singletons_with_index_ver2(C_til, clustering_info, index_size=index_size, threshold=10)
-    stats1, stats2 = find_clusters_stats(C_til, clustering_info)
+    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat0_index.txt"
+    for i in range(10):
+        if i == 4:
+            continue
+        curr_file = file_path.replace("_index.txt", f"{i}_index.txt")
+        print(f"file0{i}:")
+        test_stats(file_path=curr_file)
 
-    for orig_id, algo_cluster_stat in stats2.items():
-        is_singleton = False
-        singleton = -1
-        for algo_cluster_index, stats in algo_cluster_stat.items():
-            if stats[1] == 1:
-                is_singleton = True
-                singleton = C_til[algo_cluster_index][0]
-                break
-        if is_singleton:
-            print(f'orig_cluster_id = {orig_id}:')
-            for algo_cluster_index, stats in algo_cluster_stat.items():
-                print(f'algo_cluster_index = {algo_cluster_index} ; size_in_algo_cluster = {stats[1]:0.1f} '
-                      f'; size_of_orig_cluster = {stats[2]:0.1f} ; percentage = {stats[0]:0.4f}')
-            print('')
-            # for algo_cluster_index, stats in algo_cluster_stat.items():
-            #     cluster = C_til[algo_cluster_index]
-            #     reads_err = clustering_info.reads_err
-            #     representatives = random.sample(cluster, min([10, len(cluster)]))
-            #     identical_index_count = 0
-            #     for read in representatives:
-            #         print(reads_err[read][: index_size])
-            #         if reads_err[read][: index_size] == reads_err[singleton][: index_size]:
-            #             identical_index_count += 1
-            #     print(f'{identical_index_count=}')
-            # exit()
+
+def from_no_index_to_index_via_indices_file(indices_file_path, input_strands_file_path):
+    with open(indices_file_path, 'r', newline='\n') as ind_file:
+        index_line = ind_file.readline().rstrip()
+        index_size = len(index_line)
+        with open(input_strands_file_path, 'r', newline='\n') as input_file:
+            input_line = input_file.readline().rstrip()
+            output_path = input_strands_file_path.replace('.txt', f'_index_{index_size}.txt')
+            with open(output_path, 'w', newline='\n') as out:
+                while input_line:
+                    output_line = index_line + input_line + '\n'
+                    out.write(output_line)
+                    index_line = ind_file.readline().rstrip()
+                    input_line = input_file.readline().rstrip()
+
+
+def test_jaccard():
+    s1, _ = gen_rand_input(6, 1)
+    s2, _ = gen_rand_input(6, 1)
+    # s1 = ['ATAACGAATT']
+    # s2 = ['GTAACTAGAT']
+    # expected = (2/14) * 100
+    res = jaccard(s1[0], s2[0], 2)
+    print(f'{s1[0]=}')
+    print(f'{s2[0]=}')
+    print(f'{res=}')
+    # print(f'{expected=}')
+
+
+def understanding_singletons():
+    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
+    result_path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
+    clustering_info = ClusteringInfo(file_path=file_path)
+    C_til = file_to_algo_clustering(result_path)
+    stats1, stats2 = find_clusters_stats(C_til, clustering_info)
+    unwanted_singletons = find_unwanted_singletons(stats1)
+    count = 0
+    index_ed_dict = Counter()
+    jaccard_dis_dict = Counter()
+    gpm_dict = Counter()
+    ham_dis_dict = Counter()
+    edit_dis_dict = Counter()
+    origins_dict = Counter()
+    num_of_index_guessed_wrong = 0
+    sum_of_representatives_guessed_wrong = 0
+    max_cluster_size_of_wrong_guessed_index = 100
+    for algo_cluster_id, value in unwanted_singletons.items():
+        for origin_cluster_id in value.keys():
+            singleton_id = C_til[algo_cluster_id][0]
+            singleton = clustering_info.reads_err[singleton_id]
+            singleton_index = singleton[:6]
+            singleton_origin_id = clustering_info.reads_err_original_strand_dict[singleton_id]
+            origins_dict.update([singleton_origin_id])
+            singleton_origin = clustering_info.original_strand_dict[singleton_origin_id]
+            singleton_origin_index = singleton_origin[:6]
+            if singleton_origin_index == singleton_index:
+                count += 1
+            jaccard_dist = float("{:.3f}".format(jaccard(singleton_origin_index, singleton_index, 2)))
+            gpm_dist = float("{:.3f}".format(GPM_quick_ratio(singleton_origin_index, singleton_index)))
+            ham_dist = ham_dis(bin_sig(singleton_origin_index, 2), bin_sig(singleton_index, 2))
+            edit_dist = edit_dis(singleton_origin_index, singleton_index)
+            jaccard_dis_dict.update([jaccard_dist])
+            gpm_dict.update([gpm_dist])
+            ham_dis_dict.update([ham_dist])
+            edit_dis_dict.update([edit_dist])
+
+            singleton_family = stats2[origin_cluster_id]
+            algo_family_id = None
+            for algo_family, ststs in singleton_family.items():
+                if ststs[0] > 0.5:
+                    algo_family_id = algo_family
+            if algo_family_id is not None:
+                representatives = random.sample(C_til[algo_family_id], min([100, len(C_til[algo_family_id])]))
+                index_mat = np.array([list(clustering_info.reads_err[read][:6]) for read in representatives]).T
+                true_index = []
+                for row in index_mat:
+                    row_list = list(row)
+                    true_index.append(max(row_list, key=row_list.count))
+                str_index = ''.join(true_index)
+                if str_index != singleton_origin_index:
+                    num_of_index_guessed_wrong += 1
+                    sum_of_representatives_guessed_wrong += min([100, len(C_til[algo_family_id])])
+                    max_cluster_size_of_wrong_guessed_index = len(C_til[algo_family_id])
+                    index_ed_dict.update([edit_dis(str_index, singleton_origin_index)])
+                print(f'real index = {singleton_origin_index :8} ;   len_algo = {len(C_til[algo_family_id])} guess index = {str_index:8} ;   singleton index = {singleton_index :8}')
+            print(f'real index = {singleton_origin_index :8} ;   singleton index = {singleton_index :8}')
+    print(f'there are {count} singletons with true index from {len(unwanted_singletons)} singletons')
+    print(f'jaccard_dis_dict = {sorted(jaccard_dis_dict.items(), key=lambda pair: pair[0], reverse=True)}')
+    print(f'gpm_dict = {sorted(gpm_dict.items(), key=lambda pair: pair[0], reverse=True)}')
+    print(f'ham_dis_dict = {sorted(ham_dis_dict.items(), key=lambda pair: pair[0], reverse=False)}')
+    print(f'edit_dis_dict = {sorted(edit_dis_dict.items(), key=lambda pair: pair[0], reverse=False)}')
+    print(f'origins_dict = {[pair for pair in sorted(origins_dict.items(), key=lambda pair: pair[0], reverse=False) if pair[1]>=2]}')
+    print(f'avg cluster size of wrong guessed index {sum_of_representatives_guessed_wrong/num_of_index_guessed_wrong:0.3f}')
+    print(f'number of wrong guessed index {num_of_index_guessed_wrong}')
+    print(f'max cluster size of wrong guessed index {max_cluster_size_of_wrong_guessed_index}')
+    print(f'index_ed_dict = {sorted(index_ed_dict.items(), key=lambda pair: pair[0], reverse=False)}')
 
 
 def main():
@@ -327,8 +435,15 @@ def main():
     # create_inputs(strand_len=150, num_of_strands=3000)
     # test_time_functions()
     # test_time_and_accuracy_with_index()
-    test_stats(unions=False, singletons=False)
+    # algo_clustering_to_file(index_size=6)
+    # test_file_to_algo_clustering()
     # test_handle_singletons()
+    # no_indices_file_path = "input/3000 strands in size 150/strand_in00.txt"
+    # indices_file_path = "input/special indices/indices.txt"
+    # from_no_index_to_index_via_indices_file(indices_file_path, no_indices_file_path)
+    # test_jaccard()
+    # test_stats()
+    understanding_singletons()
 
 
 if __name__ == "__main__":

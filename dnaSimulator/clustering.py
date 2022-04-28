@@ -4,6 +4,7 @@ import shutil
 import threading
 import random
 from datetime import datetime
+from collections import Counter
 
 import numpy as np
 
@@ -182,6 +183,35 @@ def edit_dis(s1, s2):
             tbl[i, j] = min(tbl[i, j - 1] + 1, tbl[i - 1, j] + 1, tbl[i - 1, j - 1] + cost)
 
     return tbl[i, j]
+
+
+def jaccard(s1, s2, n):
+    """ Calculate the Jaccard index for string similarity between s1 to s2 \
+    where the tokens are all the substrings in"""
+    n_gram_dict = {}
+    counter = 0
+    for i in range(len(s1)-(n-1)):
+        n_gram_dict[s1[i:i + n]] = 1
+    for i in range(len(s2)-(n-1)):
+        if s2[i:i + n] in n_gram_dict:
+            n_gram_dict[s2[i:i + n]] = -1
+        else:
+            counter += 1
+    # print(n_gram_dict)
+    # print([key for key, item in n_gram_dict.items() if item < 1])
+    return 100*len([key for key, item in n_gram_dict.items() if item < 1])/(len(n_gram_dict)+counter)
+
+
+def GPM_quick_ratio(s1: str, s2: str) -> float:
+    """Return an upper bound on Gestalt Pattern Matching relatively quickly."""
+    length = len(s1) + len(s2)
+
+    if not length:
+        return 1.0
+
+    intersect = Counter(s1) & Counter(s2)
+    matches = sum(intersect.values())
+    return (2.0 * matches / length) * 100
 
 
 def create_clustering(reads_leaders):
@@ -519,9 +549,11 @@ def find_clusters_origins(algo_clustering, orig_cluster_info):
     """
     cluster_index_dict = {}
     # "clean" the output of the algo_clustering
-    for index in range(len(algo_clustering)):
-        if len(algo_clustering[index]) == 0:
-            algo_clustering.pop(index)
+
+    # for index in range(len(algo_clustering)):
+    #     if len(algo_clustering[index]) == 0:
+    #         algo_clustering.pop(index)
+    [cluster for cluster in algo_clustering if len(cluster) != 0]
     # for each cluster in the algo output check how many reads
     # are origin from the same strand.
     for index in range(len(algo_clustering)):
@@ -535,7 +567,7 @@ def find_clusters_origins(algo_clustering, orig_cluster_info):
     return cluster_index_dict
 
 
-def handle_singletons_with_index(algo_clustering, orig_cluster_info, index_size, threshold=6):
+def handle_singletons_with_index(algo_clustering, orig_cluster_info, index_size, threshold=100):
     reads_err = orig_cluster_info.reads_err
     # find singletons
     singletons = []
@@ -543,8 +575,8 @@ def handle_singletons_with_index(algo_clustering, orig_cluster_info, index_size,
         if len(cluster) == 1:
             singletons.append((cluster[0], cluster_id))
     # for each singleton search for his cluster's mates
-    for singleton, singleton_id in singletons:
-        largest_cluster = singleton_id
+    for singleton, singleton_cluster_id in singletons:
+        largest_cluster = singleton_cluster_id
         for cluster_id, cluster in enumerate(algo_clustering):
             if cluster[0] != singleton:
                 representatives = random.sample(cluster, min([threshold, len(cluster)]))
@@ -555,26 +587,38 @@ def handle_singletons_with_index(algo_clustering, orig_cluster_info, index_size,
                 if identical_index_count >= (1/2)*max([math.floor(len(representatives)), 1]):
                     if len(algo_clustering[largest_cluster]) > len(algo_clustering[cluster_id]):
                         largest_cluster = cluster_id
-        if largest_cluster != singleton_id:
-            algo_clustering[largest_cluster].extend(algo_clustering[singleton_id])
-            algo_clustering[singleton_id] = []
+        if largest_cluster != singleton_cluster_id:
+            algo_clustering[largest_cluster].extend(algo_clustering[singleton_cluster_id])
+            algo_clustering[singleton_cluster_id] = []
     return [sorted(x) for x in algo_clustering if x != []]
 
 
-def handle_singletons_with_index_ver2(algo_clustering, orig_cluster_info, index_size, threshold=6):
+def handle_singletons_with_index_ver2(algo_clustering, orig_cluster_info, index_size, threshold=100):
+    algo_clustering_copy = copy.deepcopy(algo_clustering)
     reads_err = orig_cluster_info.reads_err
+    stat1, stat2 = find_clusters_stats(algo_clustering, orig_cluster_info)
+    count_how_many_candidates_we_missed = 0
+    count_true_unwanted_singletons = 0
+    ham_dist_candidates_and_origins = {}
     # find singletons
+    unwanted_singletons = find_unwanted_singletons(stat1)
     singletons = []
     for cluster_id, cluster in enumerate(algo_clustering):
         if len(cluster) == 1:
+            if cluster_id in unwanted_singletons.keys():
+                count_true_unwanted_singletons += 1
             singletons.append((cluster[0], cluster_id))
+    print(f'{count_true_unwanted_singletons=}')
+    print(f'{len(singletons)=}')
     # for each singleton search for his cluster's mates
-    for singleton, singleton_id in singletons:
-        largest_cluster = singleton_id
+    for singleton, singleton_cluster_id in singletons:
+        largest_cluster = singleton_cluster_id
+        singleton_bin_sign = bin_sig(reads_err[singleton][index_size:], 4)
+        candidates = []
         for cluster_id, cluster in enumerate(algo_clustering):
-            if len(cluster) >= len(algo_clustering[largest_cluster]):
+            if len(cluster) >= len(algo_clustering[largest_cluster]) and cluster_id != singleton_cluster_id:
                 true_index = []
-                if cluster[0] != singleton:
+                if cluster[0] != singleton: #and len(cluster) >= 35:
                     representatives = random.sample(cluster, min([threshold, len(cluster)]))
                     index_mat = np.array([list(reads_err[read][:index_size]) for read in representatives]).T
                     for row in index_mat:
@@ -584,12 +628,89 @@ def handle_singletons_with_index_ver2(algo_clustering, orig_cluster_info, index_
                     # orig_id = orig_cluster_info.reads_err_original_strand_dict[representatives[0]]
                     # orig_index = orig_cluster_info.original_strand_dict[orig_id][: index_size]
                     # print(f'{str_index=} ; {orig_index=}')
-                    ed = edit_dis(str_index, reads_err[singleton][: index_size])
-                    if ed <= 1:
-                        largest_cluster = cluster_id
-        if largest_cluster != singleton_id:
-            algo_clustering[largest_cluster].extend(algo_clustering[singleton_id])
-            algo_clustering[singleton_id] = []
+                    # ed = edit_dis(str_index, reads_err[singleton][: index_size])
+                    # if ed <= 1:
+                    #     largest_cluster = cluster_id
+                    if str_index == reads_err[singleton][: index_size] or \
+                            edit_dis(reads_err[singleton][: index_size], str_index) <= 2:
+                        candidates.append(cluster_id)
+        compare = []
+        for cluster_id in candidates:
+            representatives = random.sample(algo_clustering[cluster_id], min([len(algo_clustering[cluster_id]), 10]))
+            ham = 0
+            for i, rep in enumerate(representatives):
+                ham += ham_dis(bin_sig(reads_err[rep][index_size:], 4), singleton_bin_sign)
+            compare.append(ham/len(representatives))
+        if len(compare) != 0:
+            largest_cluster = candidates[np.argmin(compare)]
+            origin_id = orig_cluster_info.reads_err_original_strand_dict[singleton]
+            for key, value in stat2[origin_id].items():
+                if value[0] >= 0.5:
+                    count_how_many_candidates_we_missed += 1 if key not in candidates else 0
+                    reps_from_origin = random.sample(algo_clustering_copy[key], min([len(algo_clustering_copy[key]), 10]))
+                    ham = 0
+                    for i, rep in enumerate(reps_from_origin):
+                        ham += ham_dis(bin_sig(reads_err[rep][index_size:], 4), singleton_bin_sign)
+                    ham_dist_candidates_and_origins[singleton] = (ham/len(reps_from_origin), min(compare), largest_cluster==key)
+            if largest_cluster != singleton_cluster_id:
+                if min(compare) <= 90:
+                    algo_clustering[largest_cluster].extend(algo_clustering[singleton_cluster_id])
+                    algo_clustering[singleton_cluster_id] = []
+        # print(f'singleton origin cluster in algo clustering = {stat2[origin_id]} ; {singleton_id =}; {candidates =}')
+    print(f'{count_how_many_candidates_we_missed=}')
+    print(f'{ham_dist_candidates_and_origins=}')
+    print(f'{len(ham_dist_candidates_and_origins)=}')
+    num_of_corrects = sum([int(x[2]) for x in ham_dist_candidates_and_origins.values()])
+    sum_of_ham_dists_of_correct_reps = sum([int(x[1]) for x in ham_dist_candidates_and_origins.values() if x[2]])
+    max_ham_dists_of_correct_reps = max(ham_dist_candidates_and_origins.values(), key=lambda x: x[1] if x[2] else 0)[1]
+    num_of_incorrects = sum([1 for x in ham_dist_candidates_and_origins.values() if not x[2]])
+    sum_of_ham_dists_of_incorrect_reps = sum([int(x[1]) for x in ham_dist_candidates_and_origins.values() if not x[2]])
+    min_ham_dists_of_incorrect_reps = min(ham_dist_candidates_and_origins.values(), key=lambda x: x[1] if not x[2] else 1000)[1]
+    print(f'number of corrects: {num_of_corrects}')
+    print(f'mean of corrects ham dist: {sum_of_ham_dists_of_correct_reps/num_of_corrects}')
+    print(f'max ham dist of corrects: {max_ham_dists_of_correct_reps}')
+    print(f'number of incorrects: {num_of_corrects}')
+    print(f'mean of incorrects ham dist: {sum_of_ham_dists_of_incorrect_reps / num_of_incorrects}')
+    print(f'min ham dist of incorrects: {min_ham_dists_of_incorrect_reps}')
+    return [sorted(x) for x in algo_clustering if x != []]
+
+
+def handle_singletons_with_index_ver3(algo_clustering, orig_cluster_info, index_size, threshold=6):
+    reads_err = orig_cluster_info.reads_err
+    # find singletons
+    singletons = []
+    for cluster_id, cluster in enumerate(algo_clustering):
+        if len(cluster) == 1:
+            singletons.append((cluster[0], cluster_id))
+    # for each singleton search for his cluster's mates
+
+    algo_clustering_index_bin_sign = []
+    for cluster_id, cluster in enumerate(algo_clustering):
+        representatives = random.sample(cluster, min([threshold, len(cluster)]))
+        reps_bin_sign = [bin_sig(reads_err[rep][:index_size], 3) for rep in representatives]
+        algo_clustering_index_bin_sign.append((reps_bin_sign, cluster_id))
+
+    for singleton, singleton_cluster_id in singletons:
+        dist_array = []
+        singleton_bin_sign = bin_sig(reads_err[singleton][:index_size], 3)
+        for reps_bin_sign, cluster_id in algo_clustering_index_bin_sign:
+            if cluster_id == singleton_cluster_id or len(algo_clustering[cluster_id]) == 0:
+                continue
+            dist_list = []
+            for i in range(len(reps_bin_sign)):
+                dist_list.append(ham_dis(reps_bin_sign[i], singleton_bin_sign))
+            # remove outliers
+            if len(dist_list) > threshold/2:
+                dist_list.remove(max(dist_list))
+            dist_array.append((np.mean(np.array(dist_list)), cluster_id))
+
+        # dist_array_sorted = sorted(dist_array, key=lambda x: x[0])
+        # if dist_array_sorted[0][0] == dist_array_sorted[1][0]:
+        #     print(singleton)
+        if min(dist_array, key=lambda x: x[0])[0] <= 3:
+            algo_clustering[min(dist_array, key=lambda x: x[0])[1]].extend(algo_clustering[singleton_cluster_id])
+            algo_clustering[singleton_cluster_id] = []
+
     return [sorted(x) for x in algo_clustering if x != []]
 
 
