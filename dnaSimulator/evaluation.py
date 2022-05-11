@@ -3,6 +3,8 @@ import math
 
 import numpy as np
 from clustering import *
+# from clustering import ClusteringInfo
+from metrics import *
 import timeit
 import time
 import random
@@ -10,226 +12,73 @@ from datetime import datetime
 # random.seed(datetime.now())
 
 
-def accuracies_cmp():
-    origin_path = "files/minion_idt/evyat"
-    # for i in range(0, 10):
-    #     path = origin_path + str(i) + ".txt"
-    #     print(f'file evyat0{i}:')
-    #     accuracies_cmp_aux(path)
-    accuracies_cmp_aux(origin_path + '.txt')
+def find_clusters_origins(algo_clustering, orig_cluster_info):
+    """
+    returns a dict:
+    {index of the algo cluster: value}
+    Where value is a dict:
+    {id_of_origin_strand: the number of reads that originated from
+    that original strand and in that specific algo cluster}
 
+    | Args:
+    |   algo_clustering: The output of the hash based clustering algorithm - list of clusters.
+    |                    Each cluster is a list of reads ids.
+    |   orig_cluster_info: an object of class ClusteringInfo
+    """
+    cluster_index_dict = {}
+    # "clean" the output of the algo_clustering
 
-def accuracies_cmp_aux(file_path):
-    clustering_info = ClusteringInfo(file_path=file_path)
-    C = file_to_cluster(file_path)
-    C_til_new = file_to_cluster(file_path.replace('evyat', 'temp_evyat'))
-    C_til_old = hash_based_cluster(clustering_info.reads_err)
-    # C_til_old = C_til_new
-
-    for gamma in np.arange(50, 100, 5):
-        new_acc = calc_accuracy(C, C_til_new, gamma/100)
-        old_acc = calc_acrcy(C_til_old, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma/100)
-        print(f'gamma: {gamma/100}, acc_new: {new_acc}, acc_old: {old_acc}')
-
-
-def test_gen_rand_input():
-    res, str0 = gen_rand_input(100, 5, "input/strands_in01.txt")
-    for i in range(len(res)):
-        print(f'strand {i}:')
-        print(res[i])
-    print("str:")
-    print(str0)
-
-
-def create_input(file_path, strand_len=150, num_of_strands=1024, index=None):
-    strand_list, origin = gen_rand_input(strand_len, num_of_strands)
-    index = RegIndex(math.ceil(math.log(num_of_strands, 4)))
-    res_str = ''
-    if index is not None:
-        file_path = file_path.replace('strands_in', f'strands_in_index_{index.len}')
-    for i in range(len(strand_list)):
-        if index is not None:
-            strand_list[i] = index.next() + strand_list[i]
-        res_str += strand_list[i] + '\n'
-    with open(file_path, 'w', newline='\n') as f:
-        f.write(origin)
-    if index is not None:
-        with open(file_path.replace('.txt', f'_index_{index.len}.txt'), 'w', newline='\n') as f:
-            f.write(res_str)
-
-
-class RegIndex:
-    def __init__(self, length=5):
-        self.index = 0
-        self.len = length
-        self.map_dict = {0: "A", 1: "C", 2: "G", 3: "T"}
-
-    def next(self):
-        res = decimal_to_dna_str(self.index)
-        self.index += 1
-        while len(res) != self.len:
-            res = 'A' + res
-        return res
-
-
-class IndexStride(RegIndex):
-    def __init__(self, stride):
-        super.__init__()
-        self.stride = stride
-
-    def next(self):
-        res = decimal_to_dna_str(self.index)
-        self.index += self.stride
-        while len(res) != self.len:
-            res = 'A' + res
-        return res
-
-
-def test_decimal_to_dna_str():
-    for i in range(20):
-        print(f'{i} -> {decimal_to_dna_str(i)}')
-
-
-def test_reg_index():
-    index = RegIndex(4)
-    for i in range(int(math.pow(4, 4))):
-        print(f'{i} -> {index.next()}')
-
-
-def create_inputs(strand_len=150, num_of_strands=1024):
-    origin_file_path = "input/strand_in0.txt"
-    for i in range(10):
-        file_path = origin_file_path.replace('in0', f'in0{i}')
-        create_input(file_path, strand_len, num_of_strands, index=RegIndex())
-
-
-def test_time_functions():
-    s = time.time_ns()
-    _s = timeit.default_timer()
-    __s = time.perf_counter_ns()
-    for i in range(1000):
-        pass
-    e = time.time_ns()
-    _e = timeit.default_timer()
-    __e = time.perf_counter_ns()
-    print(f'start: {s}, end: {e}, {e - s}')
-    print(f'start: {_s}, end: {_e}, {_e - _s}')
-    print(f'start: {__s}, end: {__e}, {__e - __s}')
-
-
-def test_time_and_accuracy_with_index():
-    origin_file_path = "files/minion_idt/3000 strands in size 150 with x1.5 errors and cluster avg of 40/evyat0.txt"
-    start = time.perf_counter_ns()
-    for i in range(0, 10):
-        acc_list = []
-        acc_index_list = []
-        acc_index_regular_list = []
-        path_no_index = origin_file_path.replace('.txt', f'{i}.txt')
-        path_index = origin_file_path.replace('.txt', f'{i}_index.txt')
-        clustering_info_no_index = ClusteringInfo(file_path=path_no_index)
-        clustering_info_index = ClusteringInfo(file_path=path_index)
-        s1 = time.perf_counter_ns()
-        C_til_old_no_index = hash_based_cluster(clustering_info_no_index.reads_err)
-        e1 = time.perf_counter_ns()
-        elapsed_time_ns1 = e1 - s1
-        elapsed_time_sec1 = elapsed_time_ns1 * math.pow(10, -9)
-        print(f'file0{i}\nelapsed time: {elapsed_time_sec1:0.4f} sec')
-        gammas = [0.6, 0.7, 0.8, 0.9, 0.95, 0.99]
-        for gamma in gammas:
-            old_acc = calc_acrcy(C_til_old_no_index, clustering_info_no_index.reads_err, clustering_info_no_index.C_dict
-                                 , clustering_info_no_index.C_reps, gamma)
-            print(f'gamma: {gamma:0.4f}, acc_old: {old_acc:0.6f}')
-            acc_list.append(old_acc)
-
-        s2 = time.perf_counter_ns()
-        C_til_old_index_regular = hash_based_cluster(clustering_info_index.reads_err)
-        e2 = time.perf_counter_ns()
-        elapsed_time_ns2 = e2 - s2
-        elapsed_time_sec2 = elapsed_time_ns2 * math.pow(10, -9)
-        print(f'file0{i}_index_regular\nelapsed time: {elapsed_time_sec2:0.4f} sec')
-        for gamma in gammas:
-            old_acc = calc_acrcy(C_til_old_index_regular, clustering_info_index.reads_err, clustering_info_index.C_dict
-                                 , clustering_info_index.C_reps, gamma)
-            acc_index_regular_list.append(old_acc)
-            print(f'gamma: {gamma:0.4f}, acc_old: {old_acc:0.6f}')
-
-        s3 = time.perf_counter_ns()
-        C_til_old_index = hash_based_cluster(clustering_info_index.reads_err, index_size=5, cond_func=condition4)
-        e3 = time.perf_counter_ns()
-        elapsed_time_ns3 = e3 - s3
-        elapsed_time_sec3 = elapsed_time_ns3 * math.pow(10, -9)
-        print(f'file0{i}_index\nelapsed time: {elapsed_time_sec3:0.4f} sec')
-        for gamma in gammas:
-            old_acc = calc_acrcy(C_til_old_index, clustering_info_index.reads_err, clustering_info_index.C_dict
-                                 , clustering_info_index.C_reps, gamma)
-            acc_index_list.append(old_acc)
-            print(f'gamma: {gamma:0.4f}, acc_old: {old_acc:0.6f}')
-
-        print(f'file0{i}\nsummary:')
-        time_improvement_sec_from_no_index = elapsed_time_sec1 - elapsed_time_sec3
-        time_improvement_sec_from_index_regular = elapsed_time_sec2 - elapsed_time_sec3
-        time_improvement_ns_from_no_index = elapsed_time_ns1 - elapsed_time_ns3
-        time_improvement_ns_from_index_regular = elapsed_time_ns2 - elapsed_time_ns3
-        improvement_perc1 = (time_improvement_sec_from_no_index / elapsed_time_sec1) * 100
-        improvement_perc2 = (time_improvement_sec_from_index_regular / elapsed_time_sec2) * 100
-        print(f'elapsed time not indexed     = {elapsed_time_sec1:0.4f} sec\n'
-              f'elapsed time indexed regular = {elapsed_time_sec2:0.4f} sec\n'
-              f'elapsed time indexed         = {elapsed_time_sec3:0.4f} sec\n'
-              f'elapsed time not indexed - elapsed time indexed = {time_improvement_sec_from_no_index:0.4f} sec\n'
-              f'elapsed time indexed regular - elapsed time indexed = {time_improvement_sec_from_index_regular:0.4f} sec\n'
-              f'improvement percentage with no index = {improvement_perc1:0.4f}\n'
-              f'improvement percentage with index regular = {improvement_perc2:0.4f}\n'
-              f'gamma not indexed - gamma indexed = {np.array(acc_list) - np.array(acc_index_list)}\n'
-              f'gamma indexed regular - gamma indexed = {np.array(acc_index_regular_list) - np.array(acc_index_list)}\n'
-              )
-    end = time.perf_counter_ns()
-    print(f'it took {(end - start)*math.pow(10, -9)} sec to run this')
-
-
-def algo_clustering_to_file_aux(input_path, index_size):
-    input_file_name = input_path[input_path.rfind("/"):]
-    output_path = "files/minion_idt/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
-    clustering_info = ClusteringInfo(file_path=input_path)
-    C_til = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
-    print(C_til[0])
-    with open(output_path, 'w', newline='\n') as f:
-        for cluster in C_til:
-            for read_id in cluster:
-                f.write(f"{read_id}\n")
-            f.write("***\n")
-
-
-def algo_clustering_to_file(index_size):
-    input_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat0_index.txt"
-    for i in range(10):
-        if i != 4:
-            curr_input_path = input_path.replace("_index.txt", f"{i}_index.txt")
-            algo_clustering_to_file_aux(curr_input_path, index_size)
-
-
-def file_to_algo_clustering(path):
-    clustering = []
-    cluster_id = 0
-    clustering.append([])
-    with open(path, 'r') as f:
-        line = f.readline().strip()
-        while line:
-            if line[0] != '*':
-                clustering[cluster_id].append(int(line))
-                line = f.readline()
+    # for index in range(len(algo_clustering)):
+    #     if len(algo_clustering[index]) == 0:
+    #         algo_clustering.pop(index)
+    [cluster for cluster in algo_clustering if len(cluster) != 0]
+    # for each cluster in the algo output check how many reads
+    # are origin from the same strand.
+    for index in range(len(algo_clustering)):
+        cluster_index_dict[index] = {}
+        for read_id in algo_clustering[index]:
+            orig_id = orig_cluster_info.reads_err_original_strand_dict[read_id]
+            if orig_id in cluster_index_dict[index]:
+                cluster_index_dict[index][orig_id] += 1
             else:
-                line = f.readline().strip()
-                if line:  # means new cluster
-                    clustering.append([])
-                    cluster_id += 1
-    return clustering
+                cluster_index_dict[index][orig_id] = 1
+    return cluster_index_dict
 
 
-def test_file_to_algo_clustering():
-    path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
-    clustering = file_to_algo_clustering(path)
-    print(f'{clustering[0]=}')
-    print(f'{clustering[-1]=}')
+def find_clusters_stats(algo_clustering, orig_cluster_info):
+    """
+    Returns tuple.
+    The first element is a dict:
+    {index of the algo cluster: value}
+    Where value is a dict:
+    {id_of_origin_strand: tuple
+    #element1: The ratio between the next two
+    #element2: Number of reads that originated from this origin strand
+    #element3: Size of the origin strand true cluster
+
+    The second element is the same as the first except for the keys.
+    Now the first keys are id_of_origin_strand and the second is the index of the algo cluster.
+    | Args:
+    |   algo_clustering: The output of the hash based clustering algorithm - list of clusters.
+    |                    Each cluster is a list of reads ids.
+    |   orig_cluster_info: an object of class ClusteringInfo
+    """
+    clusters_sizes = {}
+    res_stat = {}
+    res_stat2 = {}
+    cluster_index_dict = find_clusters_origins(algo_clustering, orig_cluster_info)
+    for key, value in orig_cluster_info.clustering.items():
+        clusters_sizes[key] = len(value)
+    for index, cluster_stat in cluster_index_dict.items():
+        res_stat[index] = {}
+        for orig_id, algo_size in cluster_stat.items():
+            percentage = algo_size/clusters_sizes[orig_id]
+            res_stat[index][orig_id] = (percentage, algo_size, clusters_sizes[orig_id])
+            if orig_id in res_stat2:
+                res_stat2[orig_id][index] = (percentage, algo_size, clusters_sizes[orig_id])
+            else:
+                res_stat2[orig_id] = {index: (percentage, algo_size, clusters_sizes[orig_id])}
+    return res_stat, res_stat2
 
 
 def stats_to_str_dict(stats1):
@@ -282,80 +131,83 @@ def stats_to_str_dict(stats1):
             'rebellious_reads': str_rebellious_reads}
 
 
-def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=True, file_path=None):
-    # file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
-    if file_path is None:
-        file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
-        algo_result_path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
-    clustering_info = ClusteringInfo(file_path=file_path)
-    C_til = file_to_algo_clustering(algo_result_path)
-    # C_til1 = handle_singletons_with_index(copy.deepcopy(C_til), clustering_info, index_size=6, threshold=100)
-    C_til2 = handle_singletons_with_index_ver2(copy.deepcopy(C_til), clustering_info, index_size=6, threshold=100)
-    # C_til3 = handle_singletons_with_index_ver3(copy.deepcopy(C_til), clustering_info, index_size=6, threshold=100)
+def find_unwanted_unions(stats, gamma=0.5):
+    """
+    | Args:
+    |   stats:  {index of the algo cluster: value}
+    |           Where value is a dict:
+    |           {id_of_origin_strand: tuple
+    |           #element1: The ratio between the next two
+    |           #element2: Number of reads that originated from this origin strand
+    |           #element3: Size of the origin strand true cluster
+    |   gamma:  A param that tell us how much we consider as a union between two clusters.
+    |           Default is 0.5.
+    Returns:
+        A dict similar to the arg stats. But contains only algo clusters that are unwanted unions.
+    """
+    unwanted_unions = {}
+    for index, algo_cluster_stat in stats.items():
+        if len(algo_cluster_stat.keys()) > 1:
+            count = 0
+            for orig_cluster_id, stats_ in algo_cluster_stat.items():
+                if stats_[0] >= gamma:
+                    count += 1
+            if count >= 2:
+                unwanted_unions[index] = algo_cluster_stat
+    return unwanted_unions
 
 
-    stats_ver_0 = stats_to_str_dict(find_clusters_stats(C_til, clustering_info)[0])
-    # stats_ver_1 = stats_to_str_dict(find_clusters_stats(C_til1, clustering_info)[0])
-    stats_ver_2 = stats_to_str_dict(find_clusters_stats(C_til2, clustering_info)[0])
-    # stats_ver_3 = stats_to_str_dict(find_clusters_stats(C_til3, clustering_info)[0])
-
-    if unions:
-        print(stats_ver_0['unions'])
-    if singletons:
-        print(stats_ver_0['singletons'])
-    if rebellious_reads:
-        print(stats_ver_0['rebellious_reads'])
-    if summery:
-        acc0 = calc_acrcy(C_til, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        # acc1 = calc_acrcy(C_til1, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        acc2 = calc_acrcy(C_til2, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        # acc3 = calc_acrcy(C_til3, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        print(stats_ver_0['summery'])
-        print(f'acc_ver_0 = {acc0:0.4f}\n')
-        # print(stats_ver_1['summery'])
-        # print(f'acc_ver_1 = {acc1:0.4f}\n')
-        print(stats_ver_2['summery'])
-        print(f'acc_ver_2 = {acc2:0.4f}\n')
-        # print(stats_ver_3['summery'])
-        # print(f'acc_ver_3 = {acc3:0.4f}\n')
+def find_unwanted_singletons(stats, gamma=0.5):
+    """
+    | Args:
+    |   stats:  {index of the algo cluster: value}
+    |           Where value is a dict:
+    |           {id_of_origin_strand: tuple
+    |           #element1: The ratio between the next two
+    |           #element2: Number of reads that originated from this origin strand
+    |           #element3: Size of the origin strand true cluster
+    |   gamma:  A param that tell what we consider as a singleton.
+    |           Default is 0.5.
+    Returns:
+        A dict similar to the arg stats. But contains only algo clusters that are considered singletons.
+    """
+    unwanted_singletons = {}
+    for index, algo_cluster_stat in stats.items():
+        if len(algo_cluster_stat.keys()) == 1:
+            for orig_cluster_id, stats_ in algo_cluster_stat.items():
+                if stats_[0] <= gamma and stats_[1] == 1:
+                    unwanted_singletons[index] = algo_cluster_stat
+    return unwanted_singletons
 
 
-def test_handle_singletons(index_size=6):
-    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat0_index.txt"
-    for i in range(10):
-        if i == 4:
-            continue
-        curr_file = file_path.replace("_index.txt", f"{i}_index.txt")
-        print(f"file0{i}:")
-        test_stats(file_path=curr_file)
-
-
-def from_no_index_to_index_via_indices_file(indices_file_path, input_strands_file_path):
-    with open(indices_file_path, 'r', newline='\n') as ind_file:
-        index_line = ind_file.readline().rstrip()
-        index_size = len(index_line)
-        with open(input_strands_file_path, 'r', newline='\n') as input_file:
-            input_line = input_file.readline().rstrip()
-            output_path = input_strands_file_path.replace('.txt', f'_index_{index_size}.txt')
-            with open(output_path, 'w', newline='\n') as out:
-                while input_line:
-                    output_line = index_line + input_line + '\n'
-                    out.write(output_line)
-                    index_line = ind_file.readline().rstrip()
-                    input_line = input_file.readline().rstrip()
-
-
-def test_jaccard():
-    s1, _ = gen_rand_input(6, 1)
-    s2, _ = gen_rand_input(6, 1)
-    # s1 = ['ATAACGAATT']
-    # s2 = ['GTAACTAGAT']
-    # expected = (2/14) * 100
-    res = jaccard(s1[0], s2[0], 2)
-    print(f'{s1[0]=}')
-    print(f'{s2[0]=}')
-    print(f'{res=}')
-    # print(f'{expected=}')
+def find_unwanted_rebellious_reads(stats, gamma=0.5):
+    """
+    | Args:
+    |   stats:  {index of the algo cluster: value}
+    |           Where value is a dict:
+    |           {id_of_origin_strand: tuple
+    |           #element1: The ratio between the next two
+    |           #element2: Number of reads that originated from this origin strand
+    |           #element3: Size of the origin strand true cluster
+    |   gamma:  A param that tell what we consider as a rebellious_reads.
+    |           Default is 0.5.
+    Returns:
+        A dict similar to the arg stats. But contains only algo clusters that are considered rebellious_reads
+        and contains only the information about them.
+    """
+    unwanted_rebellious_reads = {}
+    for index, algo_cluster_stat in stats.items():
+        is_rebellious = False
+        if len(algo_cluster_stat.keys()) > 1:
+            temp = {}
+            for orig_cluster_id, stats_ in algo_cluster_stat.items():
+                # temp = {}
+                if stats_[0] < gamma and stats_[1] < 5:
+                    temp[orig_cluster_id] = stats_
+                    is_rebellious = True
+            if is_rebellious:
+                unwanted_rebellious_reads[index] = temp
+    return unwanted_rebellious_reads
 
 
 def understanding_singletons():
@@ -427,24 +279,241 @@ def understanding_singletons():
     print(f'index_ed_dict = {sorted(index_ed_dict.items(), key=lambda pair: pair[0], reverse=False)}')
 
 
-def main():
-    # accuracies_cmp()
-    # test_gen_rand_input()
-    # test_decimal_to_dna_str()
-    # test_reg_index()
-    # create_inputs(strand_len=150, num_of_strands=3000)
-    # test_time_functions()
-    # test_time_and_accuracy_with_index()
-    # algo_clustering_to_file(index_size=6)
-    # test_file_to_algo_clustering()
-    # test_handle_singletons()
-    # no_indices_file_path = "input/3000 strands in size 150/strand_in00.txt"
-    # indices_file_path = "input/special indices/indices.txt"
-    # from_no_index_to_index_via_indices_file(indices_file_path, no_indices_file_path)
-    # test_jaccard()
-    # test_stats()
-    understanding_singletons()
+def understanding_unions():
+    file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
+    result_path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
+    clustering_info = ClusteringInfo(file_path=file_path)
+    reads_err = clustering_info.reads_err
+    index_size = 6
+    C_til, bin_sig_arr = file_to_algo_clustering(result_path)
+    stats1, stats2 = find_clusters_stats(C_til, clustering_info)
+    unwanted_unions = find_unwanted_unions(stats1)
+    edit_dist_counter = Counter()
+    ham_dist_dict = {}
+    reps_dict = {}
+    diffs_list = []
+    for algo_cluster_id, cluster_stats in unwanted_unions.items():
+        reps_dict[algo_cluster_id] = {}
+        ham_dist_dict[algo_cluster_id] = {}
+        algo_cluster_splited = {}
+        guessed_indexes = {}
+        for origin_strand_id, stats in cluster_stats.items():
+            if stats[0] >= 0.5:
+                algo_cluster_splited[origin_strand_id] = []
+                for read_id in C_til[algo_cluster_id]:
+                    if clustering_info.reads_err_original_strand_dict[read_id] == origin_strand_id:
+                        algo_cluster_splited[origin_strand_id].append(read_id)
+        for origin_strand_id, cluster in algo_cluster_splited.items():
+            true_index = []
+            reps = random.sample(cluster, min([10, len(cluster)]))
+            reps_dict[algo_cluster_id][origin_strand_id] = reps
+            index_mat = np.array([list(reads_err[read_id][:index_size]) for read_id in reps]).T
+            for row in index_mat:
+                row_list = list(row)
+                true_index.append(max(row_list, key=row_list.count))
+            str_index = ''.join(true_index)
+            ham = 0
+            if len(reps) > 1:
+                for i in range(len(reps)):
+                    for j in range(len(reps)):
+                        if i < j:
+                            ham += ham_dis(bin_sig_arr[reps[i]], bin_sig_arr[reps[j]])
+                ham_dist_dict[algo_cluster_id][origin_strand_id] = ham/((len(reps)**2 - len(reps))/2)
+            guessed_indexes[origin_strand_id] = str_index
+
+        reps_list = list(reps_dict[algo_cluster_id].values())
+        reps1 = reps_list[0]
+        reps2 = reps_list[1]
+        ham = 0
+        for rep1 in reps1:
+            for rep2 in reps2:
+                ham += ham_dis(bin_sig_arr[rep1], bin_sig_arr[rep2])
+        diff = ham / (len(reps1)*len(reps2)) - max(ham_dist_dict[algo_cluster_id].values())
+        ham_dist_dict[algo_cluster_id][-1] = ham / (len(reps1)*len(reps2))
+        ham_dist_dict[algo_cluster_id][-2] = diff
+        diffs_list.append(diff)
+        print(f"{ham_dist_dict[algo_cluster_id]=}")
+        print(f"{guessed_indexes}")
+        str_indexes = list(guessed_indexes.values())
+        edit_dist_counter.update([edit_dis(str_indexes[0], str_indexes[1])])
+        print(f"{edit_dis(str_indexes[0], str_indexes[1])}")
+        print(len(C_til[algo_cluster_id]))
+        # print(f"{ed_matrix}\n")
+    print(sorted(edit_dist_counter.items(), reverse=False, key=lambda x: x[0]))
+    print(f"{min(diffs_list)=}")
+
+    handle_unions(C_til, clustering_info, bin_sig_arr, index_size=6, threshold=10)
 
 
-if __name__ == "__main__":
-    main()
+#######################################
+""" functions from the Clustering-algorithm-single-core-(Erlich-sampled dataset).ipynb file """
+#######################################
+
+
+def rep_in_C(read, C_reps):
+    """
+    return the representative of the given read from the given C_reps
+    | Args:
+    |   read - A strand of DNA (string)
+    |   C_reps - A list of tuples in which the first element is a read (string) and the
+    |            second element is the read representative (string) of the cluster that the first element belongs to.
+    """
+    lower = 0
+    upper = len(C_reps) - 1
+    while lower <= upper:
+        mid = lower + int((upper - lower) / 2)
+        #         print(upper,mid)
+        res = -1
+        if read == (C_reps[mid][0]):
+            return C_reps[mid][1]
+        if read > (C_reps[mid][0]):
+            lower = mid + 1
+        else:
+            upper = mid - 1
+    return -1
+
+
+def comp_clstrs(alg_clstr, org_clstr, reads_err, gamma):
+    """
+    check if alg_cluster is at least gamma subset of the org_cluster.
+    i.e there are at least gamma*|org_clstr| reads in org_clstr that are also in alg_clstr.
+    | Args:
+    |   alg_clstr: A list of reads ids
+    |   org_clstr: A list of actual reads (i.e. the strings of DNA)
+    |   reads_err: A list in which the i'th element is the string DNA of the read with id = i
+    |   gamma: A parameter for tuning the 'strength' of the subset. Should be between 0.5 to 1
+    """
+    num_exist = 0
+    if len(alg_clstr) > len(org_clstr):
+        #         print(alg_clstr)
+        return 0
+    else:
+        for i in range(0, len(alg_clstr)):
+            flg_exist = 0
+            for j in range(0, len(org_clstr)):
+                if reads_err[alg_clstr[i]] == org_clstr[j]:
+                # TODO: replace the ifs if you want to read from file: option2
+                # if alg_clstr[i] == org_clstr[j]:
+                    flg_exist = 1
+                    num_exist += 1
+                    break
+            if flg_exist == 0:
+                return 0
+        if num_exist < gamma * len(org_clstr):
+            return 0
+
+        return 1
+
+
+def calc_acrcy(clustering, reads_err, C_dict, C_reps, gamma):
+    #     clustering = display_parent(parent)
+    """
+    calculate the accuracy of the algorithm output in a similar way to the article section 2.1
+    | Args:
+    |   clustering: A list of clusters. Each cluster is a sorted list of reads ids.
+    |   read_err: a list of all the reads. reads_err[i] = the read with id i.
+    |   C_dict: { cluster rep (full str) : List of all the reads that belong to that cluster }
+    |   C_reps: [(Read, Cluster rep of the cluster to which the read belongs to)] must be sorted lexicographic by read.
+    |   gamma: A parameter for tuning the 'strength' of the subset. Should be between 0.5 to 1
+    """
+    acrcy = 0
+    for i in range(0, len(clustering)):
+        if len(clustering[i]) >= 1:
+            acrcy += comp_clstrs(clustering[i], C_dict[rep_in_C(reads_err[clustering[i][0]], C_reps)],
+                                 reads_err, gamma)
+            # TODO: replace the above line with the 2 lines below if you want to read from file: option2
+            # c_til = clustering[i]
+            # acrcy += comp_clstrs(c_til, C_dict[rep_in_C(c_til[0], C_reps)], reads_err, gamma)
+    return acrcy/len(C_dict.keys())
+
+
+#######################################
+""" Our version of accuracy """
+#######################################
+
+
+def comp_clusters(cluster1, cluster2, gamma):
+    """
+    compute the indicator condition that is a part of the
+    accuracy definition in the article section 2 definition 2.1
+    | Args:
+    |    cluster1: cluster from the algorithm clustering
+    |    cluster2: cluster from the true clustering
+    |   gamma: A parameter for tuning the 'strength' of the subset. Should be between 0.5 to 1
+
+    Returns: 1 if cluster1 is subset of cluster2
+             and the size of the Intersection between them is larger than gamma*|cluster2|
+             otherwise return 0.
+    """
+    # if gamma < 0.5 or gamma > 1:
+    #     print(f'gamma can only be value between 0.5 to 1. you gave gamma = {gamma}')
+    #     return 0
+    # if len(cluster1) < gamma * len(cluster2):
+    #     return 0
+    # for read1 in cluster1:
+    #     exist_in_cluster2 = False
+    #     for read2 in cluster2:
+    #         if read1 == read2:
+    #             exist_in_cluster2 = True
+    #             break
+    #     if not exist_in_cluster2:
+    #         # means that cluster1 is not a subset of cluster2
+    #         return 0
+    # return 1
+
+    # alternative implementation
+    if gamma < 0.5 or gamma > 1:
+        print(f'gamma can only be value between 0.5 to 1. you gave gamma = {gamma}')
+        return 0
+    if len(cluster1) < gamma * len(cluster2):
+        return 0
+    for read in cluster1:
+        if read not in cluster2:
+            return 0
+    return 1
+
+
+def calc_accuracy(algo_clustering, true_clustering, gamma):
+    """
+    calculate the accuracy of the algorithm output in the same way as in section 2.1 in the article.
+    | Args:
+    |   algo_clustering: A dict where the keys are cluster id and the value in a list of all the reads (strings)
+    |                    that are in the cluster.
+    |   true_clustering: Same as the above. This parameter is like reference point.
+    |   gamma: A parameter for tuning the 'strength' of the subset. Should be between 0.5 to 1
+    """
+    if gamma < 0.5 or gamma > 1:
+        print(f'gamma can only be value between 0.5 to 1. you gave gamma = {gamma}')
+        return -1
+    accuracy = 0
+
+    for true_cluster in true_clustering.values():
+        for algo_cluster in algo_clustering.values():
+            if len(algo_cluster) >= 1:
+                res = comp_clusters(algo_cluster, true_cluster, gamma)
+                accuracy += res
+                if res == 1:
+                    break
+    return accuracy/len(true_clustering)
+
+
+def accuracies_cmp():
+    origin_path = "files/minion_idt/evyat"
+    # for i in range(0, 10):
+    #     path = origin_path + str(i) + ".txt"
+    #     print(f'file evyat0{i}:')
+    #     accuracies_cmp_aux(path)
+    accuracies_cmp_aux(origin_path + '.txt')
+
+
+def accuracies_cmp_aux(file_path):
+    clustering_info = ClusteringInfo(file_path=file_path)
+    C = file_to_cluster(file_path)
+    C_til_new = file_to_cluster(file_path.replace('evyat', 'temp_evyat'))
+    C_til_old = hash_based_cluster(clustering_info.reads_err)
+    # C_til_old = C_til_new
+
+    for gamma in np.arange(50, 100, 5):
+        new_acc = calc_accuracy(C, C_til_new, gamma/100)
+        old_acc = calc_acrcy(C_til_old, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma/100)
+        print(f'gamma: {gamma/100}, acc_new: {new_acc}, acc_old: {old_acc}')
