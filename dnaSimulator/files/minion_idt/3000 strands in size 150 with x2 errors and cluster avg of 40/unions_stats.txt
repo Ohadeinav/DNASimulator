@@ -1,0 +1,122 @@
+ham_dist_dict[algo_cluster_id]={60: 74.86666666666666, 558: 75.42222222222222, -1: 122.46}
+{60: 'AAAATA', 558: 'AGAGTT'}
+3
+72
+ham_dist_dict[algo_cluster_id]={386: 78.57777777777778, 1335: 69.75555555555556, -1: 119.02}
+{386: 'ACGAAA', 1335: 'CCATCT'}
+5
+67
+ham_dist_dict[algo_cluster_id]={389: 70.75555555555556, 2144: 83.6, -1: 120.46}
+{389: 'ACGGAC', 2144: 'GACGAA'}
+3
+58
+ham_dist_dict[algo_cluster_id]={436: 80.88888888888889, 1311: 77.33333333333333, -1: 120.96}
+{436: 'ACGTCA', 1311: 'CCACTT'}
+5
+93
+ham_dist_dict[algo_cluster_id]={489: 79.42222222222222, 2666: 71.64444444444445, -1: 119.6}
+{489: 'ACTGGG', 2666: 'GGCGGG'}
+3
+81
+ham_dist_dict[algo_cluster_id]={519: 80.97777777777777, 1955: 78.38888888888889, -1: 122.84444444444445}
+{519: 'AGAACC', 1955: 'CTGGAT'}
+5
+43
+ham_dist_dict[algo_cluster_id]={522: 75.52380952380952, 2389: 72.57777777777778, -1: 113.94285714285714}
+{522: 'AGAAGG', 2389: 'GCCCCC'}
+6
+37
+ham_dist_dict[algo_cluster_id]={681: 69.64444444444445, 2707: 76.91111111111111, -1: 126.16}
+{681: 'AGGGGG', 2707: 'GGGGCA'}
+3
+49
+ham_dist_dict[algo_cluster_id]={723: 66.82222222222222, 1948: 83.02222222222223, -1: 121.42}
+{723: 'AGTCCT', 1948: 'CTGCTA'}
+4
+88
+ham_dist_dict[algo_cluster_id]={771: 76.8, 820: 63.888888888888886, -1: 113.96}
+{771: 'AATAAA', 820: 'ATATTC'}
+4
+63
+ham_dist_dict[algo_cluster_id]={808: 81.15555555555555, -1: 115.2}
+{808: 'ATAGGA', 2559: 'GGCTTT'}
+6
+35
+ham_dist_dict[algo_cluster_id]={811: 74.24444444444444, 1934: 69.06666666666666, -1: 120.96}
+{811: 'ATAGGG', 1934: 'CTGATG'}
+4
+60
+ham_dist_dict[algo_cluster_id]={878: 70.17777777777778, 1666: 77.26666666666667, -1: 117.86}
+{878: 'ATCTTT', 1666: 'CGGGAA'}
+6
+65
+ham_dist_dict[algo_cluster_id]={1091: 77.0, -1: 113.9}
+{1091: 'CACAAA', 1300: 'CCACCT'}
+4
+40
+ham_dist_dict[algo_cluster_id]={1126: 76.73333333333333, 1770: 79.95555555555555, -1: 121.46}
+{1126: 'CACGCG', 1770: 'CGTGGG'}
+3
+66
+ham_dist_dict[algo_cluster_id]={1139: 66.8, 1549: 79.57777777777778, -1: 118.04}
+{1139: 'CACTAT', 1549: 'CCAAAT'}
+3
+76
+ham_dist_dict[algo_cluster_id]={1289: 74.62222222222222, 2349: 83.15555555555555, -1: 119.4}
+{1289: 'CCAAGC', 2349: 'GCAGTC'}
+3
+64
+ham_dist_dict[algo_cluster_id]={1378: 80.6, 2128: 74.75555555555556, -1: 116.82}
+{1378: 'CCCGAG', 2128: 'GACCAA'}
+4
+29
+ham_dist_dict[algo_cluster_id]={1434: 76.53333333333333, 1954: 73.22222222222223, -1: 124.46}
+{1434: 'CCGCGG', 1954: 'CTGGGA'}
+3
+70
+ham_dist_dict[algo_cluster_id]={1534: 84.04444444444445, 2307: 80.62222222222222, -1: 127.5}
+{1534: 'CCTTTT', 2307: 'GCAAAA'}
+5
+62
+ham_dist_dict[algo_cluster_id]={1654: 72.6, 2512: 75.06666666666666, -1: 118.3}
+{1654: 'CGCTCG', 2512: 'GCTCAA'}
+3
+26
+ham_dist_dict[algo_cluster_id]={1746: 80.02222222222223, 2493: 88.71428571428571, -1: 120.775}
+{1746: 'CGTTCA', 2493: 'GCGCTT'}
+4
+24
+ham_dist_dict[algo_cluster_id]={1783: 72.35555555555555, 2075: 72.35555555555555, -1: 113.28}
+{1783: 'CGTTCT', 2075: 'GAACCT'}
+4
+49
+ham_dist_dict[algo_cluster_id]={1842: 62.4, 2851: 75.84444444444445, -1: 114.28}
+{1842: 'CTATAA', 2851: 'GTAAGA'}
+3
+82
+ham_dist_dict[algo_cluster_id]={1854: 71.2, 2471: 78.46428571428571, -1: 118.7}
+{1854: 'CTATTG', 2471: 'GCGGCT'}
+5
+45
+ham_dist_dict[algo_cluster_id]={1894: 74.13333333333334, 2221: 78.5111111111111, -1: 123.5}
+{1894: 'CTCGCG', 2221: 'GAGGTC'}
+5
+40
+ham_dist_dict[algo_cluster_id]={2004: 71.5111111111111, 2712: 71.11111111111111, -1: 129.76}
+{2004: 'CTCTCC', 2712: 'GGGCGA'}
+6
+44
+ham_dist_dict[algo_cluster_id]={2037: 76.91111111111111, 2286: 71.91111111111111, -1: 121.46}
+{2037: 'CTTTCC', 2286: 'GAAGGG'}
+6
+45
+ham_dist_dict[algo_cluster_id]={2119: 85.42222222222222, 2423: 74.75555555555556, -1: 127.4}
+{2119: 'GACACT', 2423: 'GCCTCC'}
+3
+59
+ham_dist_dict[algo_cluster_id]={2744: 71.2, 2965: 83.97777777777777, -1: 119.82}
+{2744: 'GGGTGG', 2965: 'GTGCCC'}
+4
+71
+[(3, 11), (4, 8), (5, 6), (6, 5)]
+min(diffs_list)=29.41111111111111
