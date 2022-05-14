@@ -52,6 +52,16 @@ def test_time_functions():
     print(f'start: {__s}, end: {__e}, {__e - __s}')
 
 
+def time_function(func, **kwargs):
+    start = time.perf_counter_ns()
+    func_result = func(**kwargs)
+    end = time.perf_counter_ns()
+    elapsed_in_ns = end - start
+    return {'ns': elapsed_in_ns,
+            'sec': elapsed_in_ns * math.pow(10, -9),
+            'min': (elapsed_in_ns * math.pow(10, -9))/60}, func_result
+
+
 def test_time_and_accuracy_with_index():
     origin_file_path = "files/minion_idt/3000 strands in size 150 with x1.5 errors and cluster avg of 40/evyat0.txt"
     start = time.perf_counter_ns()
@@ -192,6 +202,67 @@ def test_handle_singletons(index_size=6):
             log_file.write(test_stats(file_path=curr_file, algo_result_path=curr_algo_result_path, index_size=index_size))
 
 
+def test_times():
+    file_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
+    algo_result_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
+    log_path_each_file = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/stats files/times0.txt"
+    log_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/time stats.txt"
+    log = True
+    log_each_file = True
+    index_size = 6
+    functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver2_5_clean]
+    time_stats = ''
+    for i in range(5):
+        if i != 4 and i != 6:
+            print(f'file0{i}')
+            time_stats_each_file = f'file0{i}\n'
+            curr_file_path = file_path.replace("_index.txt", f"{i}_index.txt")
+            curr_algo_result_path = algo_result_path.replace("_index_algo_result.txt", f"{i}_index_algo_result.txt")
+            curr_log_path = log_path_each_file.replace(".txt", f"{i}.txt")
+            clustering_info = ClusteringInfo(file_path=curr_file_path)
+            C_til, bin_sig_arr = file_to_algo_clustering(curr_algo_result_path)
+
+            for func in functions_to_check:
+                kw = {}
+                if func.__name__ == 'hash_based_cluster':
+                    kw = {'reads_err': clustering_info.reads_err, 'index_size': index_size}
+                elif func.__name__ == 'handle_unions':
+                    kw = {'algo_clustering': C_til,
+                          'orig_cluster_info': clustering_info,
+                          'bin_sign_arr': bin_sig_arr,
+                          'index_size': index_size,
+                          'threshold': 10, 'log': False}
+                elif func.__name__ == 'handle_singletons_with_index_ver2_5_clean':
+                    kw = {'algo_clustering': C_til,
+                          'orig_cluster_info': clustering_info,
+                          'bin_sign_arr': bin_sig_arr,
+                          'index_size': index_size,
+                          'threshold': 10}
+                else:
+                    print(f"Error: unknown function")
+
+                time_dict, func_result = time_function(func, **kw)
+                if func.__name__ != 'hash_based_cluster':
+                    C_til = func_result
+
+                time_stats_each_file += f'{func.__name__}:\n' \
+                                        f'time in ns: {time_dict["ns"]: 0.3f}\n' \
+                                        f'time in sec: {time_dict["sec"]: 0.3f}\n' \
+                                        f'time in min: {time_dict["min"]: 0.3f}\n'
+                time_stats_each_file += '\n'
+
+            if log_each_file:
+                with open(curr_log_path, 'w', newline='\n') as f:
+                    f.write(time_stats_each_file)
+            time_stats += time_stats_each_file
+            time_stats += '\n'
+
+    if log:
+        with open(log_path, 'w', newline='\n') as f:
+            f.write(time_stats)
+    return time_stats
+
+
 def main():
     # accuracies_cmp()
     # test_gen_rand_input()
@@ -209,7 +280,8 @@ def main():
     # print(test_stats())
     # understanding_singletons()
     # understanding_unions()
-    test_handle_singletons(index_size=7)
+    # test_handle_singletons(index_size=7)
+    test_times()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,68 @@
+file00
+hash_based_cluster:
+time in ns:  96417833300.000
+time in sec:  96.418
+time in min:  1.607
+
+handle_unions:
+time in ns:  6121567000.000
+time in sec:  6.122
+time in min:  0.102
+
+handle_singletons_with_index_ver2_5_clean:
+time in ns:  1447904471900.000
+time in sec:  1447.904
+time in min:  24.132
+
+
+file01
+hash_based_cluster:
+time in ns:  115521267300.000
+time in sec:  115.521
+time in min:  1.925
+
+handle_unions:
+time in ns:  7151390800.000
+time in sec:  7.151
+time in min:  0.119
+
+handle_singletons_with_index_ver2_5_clean:
+time in ns:  1477726298800.000
+time in sec:  1477.726
+time in min:  24.629
+
+
+file02
+hash_based_cluster:
+time in ns:  121484760100.000
+time in sec:  121.485
+time in min:  2.025
+
+handle_unions:
+time in ns:  6900996100.000
+time in sec:  6.901
+time in min:  0.115
+
+handle_singletons_with_index_ver2_5_clean:
+time in ns:  1745264686800.000
+time in sec:  1745.265
+time in min:  29.088
+
+
+file03
+hash_based_cluster:
+time in ns:  120539907800.000
+time in sec:  120.540
+time in min:  2.009
+
+handle_unions:
+time in ns:  6643277900.000
+time in sec:  6.643
+time in min:  0.111
+
+handle_singletons_with_index_ver2_5_clean:
+time in ns:  1549348334900.000
+time in sec:  1549.348
+time in min:  25.822
+
+
