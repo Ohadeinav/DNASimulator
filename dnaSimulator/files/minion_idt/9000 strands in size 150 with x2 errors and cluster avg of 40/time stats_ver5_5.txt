@@ -1,0 +1,48 @@
+file00
+handle_unions:
+time in ns:  7914198300.000
+time in sec:  7.914
+time in min:  0.132
+
+handle_singletons_with_index_ver5_5:
+time in ns:  28688176300.000
+time in sec:  28.688
+time in min:  0.478
+
+
+file01
+handle_unions:
+time in ns:  8956761900.000
+time in sec:  8.957
+time in min:  0.149
+
+handle_singletons_with_index_ver5_5:
+time in ns:  28288022300.000
+time in sec:  28.288
+time in min:  0.471
+
+
+file02
+handle_unions:
+time in ns:  8857414300.000
+time in sec:  8.857
+time in min:  0.148
+
+handle_singletons_with_index_ver5_5:
+time in ns:  26695047100.000
+time in sec:  26.695
+time in min:  0.445
+
+
+file03
+handle_unions:
+time in ns:  9239862700.000
+time in sec:  9.240
+time in min:  0.154
+
+handle_singletons_with_index_ver5_5:
+time in ns:  27751628000.000
+time in sec:  27.752
+time in min:  0.463
+
+

@@ -1,0 +1,40 @@
+#################################################
+               handle_unions_log                 
+#################################################
+{324: (1.0, 38, 38), 2662: (0.03225806451612903, 1, 31)}
+len(cluster1)=38
+len(cluster2)=1
+{606: (1.0, 23, 23), 1336: (0.15384615384615385, 6, 39)}
+len(cluster1)=6
+len(cluster2)=23
+{1390: (0.05555555555555555, 1, 18), 2168: (1.0, 24, 24)}
+len(cluster1)=24
+len(cluster2)=1
+count_wrong=3
+count_right=30
+
+
+summery:
+The total number of unwanted unions is 40
+The total number of unwanted singletons is 514
+The total number of clusters with unwanted rebellious reads is 71
+The avg size of unwanted rebellious reads in a cluster is 1.1972
+
+acc_ver_0 = 0.7437
+
+summery:
+The total number of unwanted unions is 10
+The total number of unwanted singletons is 516
+The total number of clusters with unwanted rebellious reads is 70
+The avg size of unwanted rebellious reads in a cluster is 1.2000
+
+acc_ver_1_5 = 0.7583
+
+summery:
+The total number of unwanted unions is 10
+The total number of unwanted singletons is 90
+The total number of clusters with unwanted rebellious reads is 70
+The avg size of unwanted rebellious reads in a cluster is 1.2000
+
+acc_ver_4 = 0.8683
+
