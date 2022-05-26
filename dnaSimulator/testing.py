@@ -148,16 +148,19 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
     C_til, bin_sig_arr = file_to_algo_clustering(algo_result_path)
     # C_til1 = handle_singletons_with_index(copy.deepcopy(C_til), clustering_info, index_size=index_size, threshold=100)
     C_til1_5, unions_log = handle_unions(copy.deepcopy(C_til), clustering_info, bin_sig_arr, index_size=index_size, threshold=10)
-    C_til2, singletons_log = handle_singletons_with_index_ver2_5(copy.deepcopy(C_til1_5), clustering_info, bin_sig_arr, index_size=index_size, threshold=12)
+    # C_til2, singletons_log = handle_singletons_with_index_ver2_5(copy.deepcopy(C_til1_5), clustering_info, bin_sig_arr, index_size=index_size, threshold=12)
     # C_til3 = handle_singletons_with_index_ver3(copy.deepcopy(C_til), clustering_info, index_size=index_size, threshold=100)
+    C_til4, singletons_log = handle_singletons_with_index_ver5_5(copy.deepcopy(C_til1_5), clustering_info, bin_sig_arr,
+                                                                 index_size=index_size, threshold=10, num_epochs=5)
 
     str_log = f'{unions_log}\n{singletons_log}\n'
 
     stats_ver_0 = stats_to_str_dict(find_clusters_stats(C_til, clustering_info)[0])
     # stats_ver_1 = stats_to_str_dict(find_clusters_stats(C_til1, clustering_info)[0])
     stats_ver_1_5 = stats_to_str_dict(find_clusters_stats(C_til1_5, clustering_info)[0])
-    stats_ver_2 = stats_to_str_dict(find_clusters_stats(C_til2, clustering_info)[0])
+    # stats_ver_2 = stats_to_str_dict(find_clusters_stats(C_til2, clustering_info)[0])
     # stats_ver_3 = stats_to_str_dict(find_clusters_stats(C_til3, clustering_info)[0])
+    stats_ver_4 = stats_to_str_dict(find_clusters_stats(C_til4, clustering_info)[0])
 
     if unions:
         str_log += f"{stats_ver_0['unions']}\n"
@@ -172,45 +175,56 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
         acc0 = calc_acrcy(C_til, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
         # acc1 = calc_acrcy(C_til1, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
         acc1_5 = calc_acrcy(C_til1_5, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        acc2 = calc_acrcy(C_til2, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        # acc2 = calc_acrcy(C_til2, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
         # acc3 = calc_acrcy(C_til3, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        acc4 = calc_acrcy(C_til4, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+
         str_log += f"{stats_ver_0['summery']}\n"
         str_log += f'acc_ver_0 = {acc0:0.4f}\n\n'
         # str_log += f"{stats_ver_1['summery']}\n"
         # str_log += f'acc_ver_1 = {acc1:0.4f}\n\n'
         str_log += f"{stats_ver_1_5['summery']}\n"
         str_log += f'acc_ver_1_5 = {acc1_5:0.4f}\n\n'
-        str_log += f"{stats_ver_2['summery']}\n"
-        str_log += f'acc_ver_2 = {acc2:0.4f}\n\n'
+        # str_log += f"{stats_ver_2['summery']}\n"
+        # str_log += f'acc_ver_2 = {acc2:0.4f}\n\n'
         # str_log += f"{stats_ver_3['summery']}\n"
         # str_log += f'acc_ver_3 = {acc3:0.4f}\n\n'
+        str_log += f"{stats_ver_4['summery']}\n"
+        str_log += f'acc_ver_4 = {acc4:0.4f}\n\n'
     return str_log
 
 
-def test_handle_singletons(index_size=6):
-    file_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
-    algo_result_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
-    log_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/stats files/stats0.txt"
-    for i in range(10):
+def test_handle_singletons(index_size=6, log=True, to_print=True):
+    file_path = "files/minion_idt/6000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
+    algo_result_path = "files/minion_idt/6000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
+    log_path = "files/minion_idt/6000 strands in size 150 with x2 errors and cluster avg of 40/stats files/stats0_ver5_5.txt"
+    for i in range(5):
         if i == 4:
             continue
         curr_file = file_path.replace("_index.txt", f"{i}_index.txt")
         curr_algo_result_path = algo_result_path.replace("_index_algo_result.txt", f"{i}_index_algo_result.txt")
+        # curr_algo_result_path = algo_result_path.replace("_index_algo_result.txt", f"{i}_index_algo_result_shuffled.txt")
         curr_log_path = log_path.replace(".txt", f"{i}.txt")
         print(f"file0{i}:")
-        with open(curr_log_path, 'w', newline='\n') as log_file:
-            log_file.write(test_stats(file_path=curr_file, algo_result_path=curr_algo_result_path, index_size=index_size))
+        res = test_stats(file_path=curr_file, algo_result_path=curr_algo_result_path, index_size=index_size)
+        if log:
+            with open(curr_log_path, 'w', newline='\n') as log_file:
+                log_file.write(res)
+        if to_print:
+            print(res)
 
 
-def test_times():
+def test_times(log=True, log_each_file=True):
     file_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
     algo_result_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
     log_path_each_file = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/stats files/times0.txt"
-    log_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/time stats.txt"
-    log = True
-    log_each_file = True
+    log_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/time stats_ver5_5.txt"
+    # log = False
+    # log_each_file = True
     index_size = 6
-    functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver2_5_clean]
+    # functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver2_5_clean]
+    functions_to_check = [handle_unions, handle_singletons_with_index_ver5_5]
+
     time_stats = ''
     for i in range(5):
         if i != 4 and i != 6:
@@ -232,7 +246,7 @@ def test_times():
                           'bin_sign_arr': bin_sig_arr,
                           'index_size': index_size,
                           'threshold': 10, 'log': False}
-                elif func.__name__ == 'handle_singletons_with_index_ver2_5_clean':
+                elif func.__name__.startswith('handle_singletons_with_index'):
                     kw = {'algo_clustering': C_til,
                           'orig_cluster_info': clustering_info,
                           'bin_sign_arr': bin_sig_arr,
@@ -271,7 +285,7 @@ def main():
     # create_inputs(strand_len=150, num_of_strands=9000)
     # test_time_functions()
     # test_time_and_accuracy_with_index()
-    # algo_clustering_to_file(index_size=7)
+    # algo_clustering_to_file(index_size=6)
     # test_file_to_algo_clustering()
     # no_indices_file_path = "input/3000 strands in size 150/strand_in00.txt"
     # indices_file_path = "input/special indices/indices.txt"
@@ -280,8 +294,8 @@ def main():
     # print(test_stats())
     # understanding_singletons()
     # understanding_unions()
-    # test_handle_singletons(index_size=7)
-    test_times()
+    test_handle_singletons(index_size=7, log=True)
+    # test_times(True, False)
 
 
 if __name__ == "__main__":
