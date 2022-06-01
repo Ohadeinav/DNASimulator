@@ -1031,7 +1031,7 @@ def find_best_cluster(c_til, singleton_id, singleton_cluster_id, candidates_ids,
 def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_sign_arr, index_size, threshold=10, num_epochs=2):
     algo_clustering_copy = copy.deepcopy(algo_clustering)
     for epoch_id in range(num_epochs):
-        print(f"epoch: {epoch_id}")
+        # print(f"epoch: {epoch_id}")
         reads_err = orig_cluster_info.reads_err
         stat1, stat2 = find_clusters_stats(algo_clustering_copy, orig_cluster_info)
         w = math.ceil(math.log(len(reads_err[0][index_size:]), 4))
@@ -1064,7 +1064,7 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
                     #     candidates[str_sub_sign][singleton_id] += 1
                     # else:
                     #     candidates[str_sub_sign][singleton_id] = 1
-        print(f"there are {len(singletons)} singletons")
+        # print(f"there are {len(singletons)} singletons")
         # find clusters reps and their index:
         clusters_reps = {}
         for cluster_id, cluster in enumerate(algo_clustering_copy):
@@ -1148,18 +1148,23 @@ def separate_cluster(cluster, orig_cluster_info, bin_sign_arr, index_size, thres
     for i in range(len(cluster2)):
         for j in range(i + 1, len(cluster2)):
             dists_inside_cluster2.append(ham_dis(bin_sign_arr[cluster2[i]], bin_sign_arr[cluster2[j]]))
-    if np.mean(dists_inside_cluster1) > 100 and np.mean(dists_inside_cluster2) > 100:
+
+    mean_dists_inside_cluster1 = 0 if len(dists_inside_cluster1) == 0 else np.mean(dists_inside_cluster1)
+    mean_dists_inside_cluster2 = 0 if len(dists_inside_cluster2) == 0 else np.mean(dists_inside_cluster2)
+    if mean_dists_inside_cluster1 > 100 and mean_dists_inside_cluster2 > 100:
         return None, None
     dists_between_clusters = []
     for i in range(len(cluster1)):
         for j in range(len(cluster2)):
             dists_between_clusters.append(ham_dis(bin_sign_arr[cluster1[i]], bin_sign_arr[cluster2[j]]))
-    if np.mean(dists_between_clusters)-min([np.mean(dists_inside_cluster1), np.mean(dists_inside_cluster2)]) <= 25:
+
+    mean_dists_between_clusters = 0 if len(dists_between_clusters) == 0 else np.mean(dists_between_clusters)
+    if mean_dists_between_clusters-min([mean_dists_inside_cluster1, mean_dists_inside_cluster2]) <= 25:
         return None, None
     return cluster1, cluster2
 
 
-def handle_unions(algo_clustering, orig_cluster_info, bin_sign_arr, index_size, threshold=100, log=True):
+def handle_unions(algo_clustering, orig_cluster_info, bin_sign_arr, index_size, threshold=10, log=True):
     avg_cluster_size = sum([len(cluster) for cluster in algo_clustering])/len(algo_clustering)
     count_wrong = 0
     count_right = 0
