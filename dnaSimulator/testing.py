@@ -139,7 +139,7 @@ def test_file_to_algo_clustering():
 
 
 def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=True,
-               file_path=None, algo_result_path=None, index_size=0):
+               file_path=None, algo_result_path=None, index_size=0, gamma=0.99):
     # file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
     if file_path is None:
         file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat00_index.txt"
@@ -172,12 +172,12 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
         str_log += f"{stats_ver_0['rebellious_reads']}\n"
         # print(stats_ver_0['rebellious_reads'])
     if summery:
-        acc0 = calc_acrcy(C_til, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        # acc1 = calc_acrcy(C_til1, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        acc1_5 = calc_acrcy(C_til1_5, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        # acc2 = calc_acrcy(C_til2, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        # acc3 = calc_acrcy(C_til3, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
-        acc4 = calc_acrcy(C_til4, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=0.99)
+        acc0 = calc_acrcy(C_til, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=gamma)
+        # acc1 = calc_acrcy(C_til1, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=gamma)
+        acc1_5 = calc_acrcy(C_til1_5, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=gamma)
+        # acc2 = calc_acrcy(C_til2, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=gamma)
+        # acc3 = calc_acrcy(C_til3, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=gamma)
+        acc4 = calc_acrcy(C_til4, clustering_info.reads_err, clustering_info.C_dict, clustering_info.C_reps, gamma=gamma)
 
         str_log += f"{stats_ver_0['summery']}\n"
         str_log += f'acc_ver_0 = {acc0:0.4f}\n\n'
