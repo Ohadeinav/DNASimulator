@@ -1028,16 +1028,23 @@ def find_best_cluster(c_til, singleton_id, singleton_cluster_id, candidates_ids,
     return best_cluster_id
 
 
-def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_sign_arr, index_size, threshold=10, num_epochs=2):
+def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_sign_arr, index_size,
+                                        threshold=10, num_epochs=2, num_of_hashes=20,
+                                        return_stats=False):
     algo_clustering_copy = copy.deepcopy(algo_clustering)
+    times_for_each_epoch = [0]
+    num_of_remaining_singletons = []
+    stat1, stat2 = find_clusters_stats(algo_clustering_copy, orig_cluster_info)
+    num_of_remaining_singletons.append(len(find_unwanted_singletons(stat1)))
     for epoch_id in range(num_epochs):
         # print(f"epoch: {epoch_id}")
+        start = time.perf_counter_ns()
         reads_err = orig_cluster_info.reads_err
         stat1, stat2 = find_clusters_stats(algo_clustering_copy, orig_cluster_info)
         w = math.ceil(math.log(len(reads_err[0][index_size:]), 4))
         l = math.ceil(math.log(len(reads_err), 4))-3
         hashing_a = []
-        for i in range(20):
+        for i in range(num_of_hashes):
             a = rand_perm(w)
             hashing_a.append(a)
 
@@ -1098,6 +1105,14 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
                 algo_clustering_copy[singleton_cluster_id] = []
 
         algo_clustering_copy = [x for x in algo_clustering_copy if x != []]
+        end = time.perf_counter_ns()
+        elapsed_in_ns = end - start
+        times_for_each_epoch.append((elapsed_in_ns * math.pow(10, -9))/60)
+        stat1, stat2 = find_clusters_stats(algo_clustering_copy, orig_cluster_info)
+        num_of_remaining_singletons.append(len(find_unwanted_singletons(stat1)))
+    if return_stats:
+        return [sorted(x) for x in algo_clustering_copy if x != []], '',\
+               num_of_remaining_singletons, times_for_each_epoch
     return [sorted(x) for x in algo_clustering_copy if x != []], ''
 
 
@@ -1248,8 +1263,8 @@ def file_to_cluster(file_path):
 
 def algo_clustering_to_file_aux(input_path, index_size):
     input_file_name = input_path[input_path.rfind("/"):]
-    # output_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
-    output_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result_shuffled.txt")
+    output_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
+    # output_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result_shuffled.txt")
     clustering_info = ClusteringInfo(file_path=input_path)
     C_til, bin_sig_arr = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
     print(C_til[0])
@@ -1264,8 +1279,8 @@ def algo_clustering_to_file_aux(input_path, index_size):
 
 
 def algo_clustering_to_file(index_size):
-    input_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
-    for i in range(2):
+    input_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
+    for i in range(5):
         if i != 4:
             curr_input_path = input_path.replace("_index.txt", f"{i}_index.txt")
             algo_clustering_to_file_aux(curr_input_path, index_size)
