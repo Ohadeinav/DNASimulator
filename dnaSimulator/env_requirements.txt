@@ -1,0 +1,10 @@
+jupyterlab
+nbconvert
+PyQt5
+scipy
+Pillow
+matplotlib
+edlib
+tqdm
+ipywidgets
+seaborn
