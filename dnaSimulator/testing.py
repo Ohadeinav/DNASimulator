@@ -214,16 +214,15 @@ def test_handle_singletons(index_size=6, log=True, to_print=True):
             print(res)
 
 
-def test_times(log=True, log_each_file=True):
-    file_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
-    algo_result_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
-    log_path_each_file = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/stats files/times0.txt"
-    log_path = "files/minion_idt/9000 strands in size 150 with x2 errors and cluster avg of 40/time stats_ver5_5.txt"
+def test_times(log=True, log_each_file=True, index_size=6):
+    file_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
+    algo_result_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
+    log_path_each_file = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/stats files/times0.txt"
+    log_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/time stats_ver5_5.txt"
     # log = False
     # log_each_file = True
-    index_size = 6
     # functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver2_5_clean]
-    functions_to_check = [handle_unions, handle_singletons_with_index_ver5_5]
+    functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver5_5]
 
     time_stats = ''
     for i in range(5):
@@ -285,17 +284,17 @@ def main():
     # create_inputs(strand_len=150, num_of_strands=9000)
     # test_time_functions()
     # test_time_and_accuracy_with_index()
-    # algo_clustering_to_file(index_size=6)
+    # algo_clustering_to_file(index_size=7)
     # test_file_to_algo_clustering()
     # no_indices_file_path = "input/3000 strands in size 150/strand_in00.txt"
     # indices_file_path = "input/special indices/indices.txt"
     # from_no_index_to_index_via_indices_file(indices_file_path, no_indices_file_path)
-    # test_jaccard()
+    test_jaccard()
     # print(test_stats())
     # understanding_singletons()
     # understanding_unions()
-    test_handle_singletons(index_size=7, log=True)
-    # test_times(True, False)
+    # test_handle_singletons(index_size=7, log=True)
+    # test_times(True, True, index_size=7)
 
 
 if __name__ == "__main__":
