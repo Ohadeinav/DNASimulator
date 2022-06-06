@@ -1,0 +1,76 @@
+#################################################
+               handle_unions_log                 
+#################################################
+{24: (0.4166666666666667, 10, 24), 12744: (1.0, 13, 13)}
+len(cluster1)=13
+len(cluster2)=10
+{718: (0.4146341463414634, 17, 41), 11956: (0.9, 18, 20)}
+len(cluster1)=17
+len(cluster2)=18
+{3394: (0.1, 2, 20), 39476: (0.9696969696969697, 32, 33)}
+len(cluster1)=32
+len(cluster2)=2
+{6132: (1.0, 14, 14)}
+len(cluster1)=1
+len(cluster2)=13
+{15145: (0.8571428571428571, 18, 21), 43263: (0.041666666666666664, 2, 48)}
+len(cluster1)=18
+len(cluster2)=2
+{15852: (1.0, 37, 37), 34506: (0.05555555555555555, 1, 18)}
+len(cluster1)=2
+len(cluster2)=36
+{17756: (1.0, 25, 25), 32666: (0.08, 4, 50)}
+len(cluster1)=25
+len(cluster2)=4
+{19661: (1.0, 26, 26)}
+len(cluster1)=1
+len(cluster2)=25
+{22168: (0.52, 13, 25), 30597: (0.47368421052631576, 18, 38)}
+len(cluster1)=18
+len(cluster2)=13
+{35041: (0.16666666666666666, 1, 6), 38042: (1.0, 14, 14)}
+len(cluster1)=1
+len(cluster2)=14
+{36554: (0.9361702127659575, 44, 47), 43063: (0.10526315789473684, 4, 38)}
+len(cluster1)=44
+len(cluster2)=4
+{36939: (0.4897959183673469, 24, 49), 43059: (1.0, 21, 21)}
+len(cluster1)=24
+len(cluster2)=21
+{37612: (0.2, 1, 5), 45227: (1.0, 26, 26)}
+len(cluster1)=26
+len(cluster2)=1
+{38865: (1.0, 18, 18), 47101: (0.020833333333333332, 1, 48)}
+len(cluster1)=1
+len(cluster2)=18
+{48912: (0.42857142857142855, 21, 49)}
+len(cluster1)=20
+len(cluster2)=1
+count_wrong=15
+count_right=19
+
+
+summery:
+The total number of unwanted unions is 21
+The total number of unwanted singletons is 32466
+The total number of clusters with unwanted rebellious reads is 126
+The avg size of unwanted rebellious reads in a cluster is 1.3968
+
+acc_ver_0 = 0.4465
+
+summery:
+The total number of unwanted unions is 2
+The total number of unwanted singletons is 32472
+The total number of clusters with unwanted rebellious reads is 121
+The avg size of unwanted rebellious reads in a cluster is 1.3554
+
+acc_ver_1_5 = 0.4469
+
+summery:
+The total number of unwanted unions is 7
+The total number of unwanted singletons is 3684
+The total number of clusters with unwanted rebellious reads is 172
+The avg size of unwanted rebellious reads in a cluster is 1.4302
+
+acc_ver_4 = 0.7659
+

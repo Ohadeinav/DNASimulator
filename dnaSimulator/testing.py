@@ -142,8 +142,8 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
                file_path=None, algo_result_path=None, index_size=0, gamma=0.99):
     # file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
     if file_path is None:
-        file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat00_index.txt"
-        algo_result_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat00_index_algo_result.txt"
+        file_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat00_index.txt"
+        algo_result_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/algo_results/evyat00_index_algo_result.txt"
     clustering_info = ClusteringInfo(file_path=file_path)
     C_til, bin_sig_arr = file_to_algo_clustering(algo_result_path)
     # C_til1 = handle_singletons_with_index(copy.deepcopy(C_til), clustering_info, index_size=index_size, threshold=100)
@@ -151,7 +151,7 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
     # C_til2, singletons_log = handle_singletons_with_index_ver2_5(copy.deepcopy(C_til1_5), clustering_info, bin_sig_arr, index_size=index_size, threshold=12)
     # C_til3 = handle_singletons_with_index_ver3(copy.deepcopy(C_til), clustering_info, index_size=index_size, threshold=100)
     C_til4, singletons_log = handle_singletons_with_index_ver5_5(copy.deepcopy(C_til1_5), clustering_info, bin_sig_arr,
-                                                                 index_size=index_size, threshold=10, num_epochs=5)
+                                                                 index_size=index_size, threshold=10, num_epochs=4)
 
     str_log = f'{unions_log}\n{singletons_log}\n'
 
@@ -195,12 +195,12 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
 
 
 def test_handle_singletons(index_size=6, log=True, to_print=True):
-    file_path = "files/minion_idt/6000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
-    algo_result_path = "files/minion_idt/6000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
-    log_path = "files/minion_idt/6000 strands in size 150 with x2 errors and cluster avg of 40/stats files/stats0_ver5_5.txt"
+    file_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat0_index.txt"
+    algo_result_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/algo_results/evyat0_index_algo_result.txt"
+    log_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/stats files/stats0.txt"
     for i in range(5):
-        if i == 4:
-            continue
+        # if i == 4:
+        #     continue
         curr_file = file_path.replace("_index.txt", f"{i}_index.txt")
         curr_algo_result_path = algo_result_path.replace("_index_algo_result.txt", f"{i}_index_algo_result.txt")
         # curr_algo_result_path = algo_result_path.replace("_index_algo_result.txt", f"{i}_index_algo_result_shuffled.txt")
@@ -214,11 +214,11 @@ def test_handle_singletons(index_size=6, log=True, to_print=True):
             print(res)
 
 
-def test_times(log=True, log_each_file=True, index_size=6):
-    file_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
-    algo_result_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/algo_results/evyat0_index_algo_result.txt"
-    log_path_each_file = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/stats files/times0.txt"
-    log_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/time stats_ver5_5.txt"
+def test_times(log=True, log_each_file=True, index_size=6, save=False):
+    file_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat0_index.txt"
+    algo_result_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/algo_results/evyat0_index_algo_result.txt"
+    log_path_each_file = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/stats files/times0.txt"
+    log_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/time stats_ver5_5.txt"
     # log = False
     # log_each_file = True
     # functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver2_5_clean]
@@ -226,7 +226,8 @@ def test_times(log=True, log_each_file=True, index_size=6):
 
     time_stats = ''
     for i in range(5):
-        if i != 4 and i != 6:
+        # if i != 4 and i != 6:
+        if True:
             print(f'file0{i}')
             time_stats_each_file = f'file0{i}\n'
             curr_file_path = file_path.replace("_index.txt", f"{i}_index.txt")
@@ -284,17 +285,17 @@ def main():
     # create_inputs(strand_len=150, num_of_strands=9000)
     # test_time_functions()
     # test_time_and_accuracy_with_index()
-    # algo_clustering_to_file(index_size=7)
+    # algo_clustering_to_file(index_size=8)
     # test_file_to_algo_clustering()
     # no_indices_file_path = "input/3000 strands in size 150/strand_in00.txt"
     # indices_file_path = "input/special indices/indices.txt"
     # from_no_index_to_index_via_indices_file(indices_file_path, no_indices_file_path)
-    test_jaccard()
+    # test_jaccard()
     # print(test_stats())
     # understanding_singletons()
     # understanding_unions()
-    # test_handle_singletons(index_size=7, log=True)
-    # test_times(True, True, index_size=7)
+    test_handle_singletons(index_size=8, log=True)
+    # test_times(True, True, index_size=8)
 
 
 if __name__ == "__main__":

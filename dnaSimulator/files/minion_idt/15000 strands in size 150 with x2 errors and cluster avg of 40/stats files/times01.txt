@@ -1,0 +1,16 @@
+file01
+hash_based_cluster:
+time in ns:  1491558645800.000
+time in sec:  1491.559
+time in min:  24.859
+
+handle_unions:
+time in ns:  19592381100.000
+time in sec:  19.592
+time in min:  0.327
+
+handle_singletons_with_index_ver5_5:
+time in ns:  232826743800.000
+time in sec:  232.827
+time in min:  3.880
+

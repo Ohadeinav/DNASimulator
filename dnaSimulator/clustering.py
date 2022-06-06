@@ -1263,7 +1263,7 @@ def file_to_cluster(file_path):
 
 def algo_clustering_to_file_aux(input_path, index_size):
     input_file_name = input_path[input_path.rfind("/"):]
-    output_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
+    output_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
     # output_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result_shuffled.txt")
     clustering_info = ClusteringInfo(file_path=input_path)
     C_til, bin_sig_arr = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
@@ -1279,9 +1279,10 @@ def algo_clustering_to_file_aux(input_path, index_size):
 
 
 def algo_clustering_to_file(index_size):
-    input_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
+    input_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat0_index.txt"
     for i in range(5):
-        if i != 4:
+        # if i != 4:
+        if True:
             curr_input_path = input_path.replace("_index.txt", f"{i}_index.txt")
             algo_clustering_to_file_aux(curr_input_path, index_size)
 
