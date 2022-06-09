@@ -1030,13 +1030,20 @@ def find_best_cluster(c_til, singleton_id, singleton_cluster_id, candidates_ids,
 
 def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_sign_arr, index_size,
                                         threshold=10, num_epochs=2, num_of_hashes=20,
-                                        return_stats=False):
+                                        return_stats=False, converge=False,
+                                        convergence_param=10, convergence_ratio=0.8):
     algo_clustering_copy = copy.deepcopy(algo_clustering)
     times_for_each_epoch = [0]
+    ########################################################################
+    # can not use this vars because they have knowledge about the real clustering:
     num_of_remaining_singletons = []
     stat1, stat2 = find_clusters_stats(algo_clustering_copy, orig_cluster_info)
     num_of_remaining_singletons.append(len(find_unwanted_singletons(stat1)))
-    for epoch_id in range(num_epochs):
+    ########################################################################
+    number_of_singletons = None  # will represent both wanted and unwanted singletons.
+                                 # Meaning sees only the algo clustering and not the real clustering.
+    epoch_id = 0
+    while epoch_id < num_epochs or converge:
         # print(f"epoch: {epoch_id}")
         start = time.perf_counter_ns()
         reads_err = orig_cluster_info.reads_err
@@ -1071,6 +1078,16 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
                     #     candidates[str_sub_sign][singleton_id] += 1
                     # else:
                     #     candidates[str_sub_sign][singleton_id] = 1
+        if number_of_singletons is None:
+            number_of_singletons = len(singletons)
+            print(f'number of singletons before: {number_of_singletons}')
+        elif converge and (number_of_singletons - len(singletons) <= convergence_param
+                           or len(singletons)/number_of_singletons > convergence_ratio):
+            print(f'converge after {epoch_id} epochs')
+            break
+        else:
+            number_of_singletons = len(singletons)
+            print(f'number of singletons after {epoch_id} epochs: {number_of_singletons}')
         # print(f"there are {len(singletons)} singletons")
         # find clusters reps and their index:
         clusters_reps = {}
@@ -1110,6 +1127,9 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
         times_for_each_epoch.append((elapsed_in_ns * math.pow(10, -9))/60)
         stat1, stat2 = find_clusters_stats(algo_clustering_copy, orig_cluster_info)
         num_of_remaining_singletons.append(len(find_unwanted_singletons(stat1)))
+
+        epoch_id += 1
+
     if return_stats:
         return [sorted(x) for x in algo_clustering_copy if x != []], '',\
                num_of_remaining_singletons, times_for_each_epoch
