@@ -1,127 +1,121 @@
 #################################################
                handle_unions_log                 
 #################################################
-{216: (0.8604651162790697, 37, 43), 20712: (0.02127659574468085, 1, 47)}
-len(cluster1)=37
-len(cluster2)=1
-{581: (0.1111111111111111, 3, 27), 2992: (1.0, 18, 18)}
-len(cluster1)=19
-len(cluster2)=2
-{1584: (0.1, 1, 10), 19302: (0.9354838709677419, 29, 31)}
+{419: (0.027777777777777776, 1, 36), 32175: (1.0, 14, 14)}
 len(cluster1)=1
-len(cluster2)=29
+len(cluster2)=14
 {3945: (0.9523809523809523, 20, 21), 24783: (0.0851063829787234, 4, 47)}
 len(cluster1)=4
 len(cluster2)=20
 {3991: (0.06666666666666667, 3, 45), 40436: (0.5555555555555556, 15, 27)}
-len(cluster1)=15
-len(cluster2)=3
+len(cluster1)=3
+len(cluster2)=15
 {4128: (0.14285714285714285, 2, 14), 4285: (0.6363636363636364, 21, 33)}
 len(cluster1)=21
 len(cluster2)=2
 {4626: (0.28125, 9, 32), 17703: (0.9411764705882353, 16, 17)}
-len(cluster1)=16
-len(cluster2)=9
+len(cluster1)=9
+len(cluster2)=16
 {5853: (0.3333333333333333, 15, 45), 41390: (1.0, 43, 43)}
-len(cluster1)=43
-len(cluster2)=15
-{5925: (0.1111111111111111, 1, 9), 18244: (0.975, 39, 40)}
-len(cluster1)=39
-len(cluster2)=1
+len(cluster1)=15
+len(cluster2)=43
 {6158: (0.25, 1, 4), 8574: (1.0, 19, 19)}
 len(cluster1)=1
 len(cluster2)=19
-{7526: (0.12, 3, 25), 8134: (0.04878048780487805, 2, 41), 45878: (1.0, 35, 35)}
-len(cluster1)=5
-len(cluster2)=35
-{7886: (1.0, 15, 15)}
+{6971: (1.0, 15, 15), 13196: (0.06382978723404255, 3, 47)}
+len(cluster1)=3
+len(cluster2)=15
+{7658: (0.027777777777777776, 1, 36), 40401: (0.9444444444444444, 17, 18)}
 len(cluster1)=1
-len(cluster2)=14
+len(cluster2)=17
 {8457: (0.8333333333333334, 10, 12), 16203: (0.12195121951219512, 5, 41)}
 len(cluster1)=10
 len(cluster2)=5
-{8572: (0.02564102564102564, 1, 39), 36222: (1.0, 48, 48)}
-len(cluster1)=2
+{8510: (0.13043478260869565, 3, 23), 13164: (0.7307692307692307, 19, 26)}
+len(cluster1)=18
+len(cluster2)=4
+{9624: (0.04081632653061224, 2, 49), 47739: (1.0, 32, 32)}
+len(cluster1)=32
+len(cluster2)=2
+{10138: (1.0, 47, 47), 40058: (0.4, 4, 10)}
+len(cluster1)=4
 len(cluster2)=47
-{13199: (0.3181818181818182, 7, 22), 38785: (0.9705882352941176, 33, 34)}
-len(cluster1)=7
-len(cluster2)=33
-{14936: (1.0, 18, 18), 30318: (0.022727272727272728, 1, 44)}
+{10356: (0.2564102564102564, 10, 39), 44491: (0.9761904761904762, 41, 42)}
+len(cluster1)=11
+len(cluster2)=40
+{11070: (0.0967741935483871, 3, 31), 16171: (1.0, 17, 17)}
+len(cluster1)=17
+len(cluster2)=3
+{11837: (0.06896551724137931, 2, 29), 45336: (1.0, 14, 14)}
+len(cluster1)=13
+len(cluster2)=3
+{11979: (0.07692307692307693, 1, 13), 24236: (1.0, 17, 17)}
 len(cluster1)=1
-len(cluster2)=18
+len(cluster2)=17
+{13020: (0.12121212121212122, 4, 33), 49323: (1.0, 23, 23)}
+len(cluster1)=4
+len(cluster2)=23
+{14690: (0.9166666666666666, 22, 24), 47711: (0.020833333333333332, 1, 48)}
+len(cluster1)=22
+len(cluster2)=1
+{14936: (1.0, 18, 18), 30318: (0.022727272727272728, 1, 44)}
+len(cluster1)=18
+len(cluster2)=1
+{15207: (0.9615384615384616, 25, 26), 31678: (0.3103448275862069, 9, 29)}
+len(cluster1)=9
+len(cluster2)=25
+{15428: (1.0, 46, 46), 31405: (0.23529411764705882, 8, 34)}
+len(cluster1)=8
+len(cluster2)=46
 {15661: (0.9767441860465116, 42, 43), 34342: (0.41379310344827586, 12, 29)}
 len(cluster1)=42
 len(cluster2)=12
-{16439: (0.45454545454545453, 5, 11), 27116: (0.8846153846153846, 23, 26)}
-len(cluster1)=23
-len(cluster2)=5
-{18364: (1.0, 15, 15), 18839: (0.02127659574468085, 1, 47)}
-len(cluster1)=15
-len(cluster2)=1
-{21052: (1.0, 22, 22)}
+{16979: (0.04, 1, 25), 31205: (1.0, 48, 48)}
 len(cluster1)=1
-len(cluster2)=21
-{23010: (0.06060606060606061, 2, 33), 23506: (1.0, 22, 22)}
-len(cluster1)=2
-len(cluster2)=22
-{23293: (0.9230769230769231, 24, 26)}
-len(cluster1)=1
+len(cluster2)=48
+{16986: (1.0, 23, 23), 28713: (0.1111111111111111, 4, 36)}
+len(cluster1)=4
 len(cluster2)=23
-{26079: (0.02857142857142857, 1, 35), 39588: (0.96875, 31, 32)}
-len(cluster1)=31
-len(cluster2)=1
+{17266: (1.0, 42, 42), 28784: (0.43478260869565216, 10, 23)}
+len(cluster1)=42
+len(cluster2)=10
+{18364: (1.0, 15, 15), 18839: (0.02127659574468085, 1, 47)}
+len(cluster1)=1
+len(cluster2)=15
+{24195: (0.027777777777777776, 1, 36), 24900: (1.0, 19, 19)}
+len(cluster1)=1
+len(cluster2)=19
 {26151: (0.06818181818181818, 3, 44), 42694: (0.9629629629629629, 26, 27)}
 len(cluster1)=3
 len(cluster2)=26
-{26519: (1.0, 34, 34), 30070: (0.027777777777777776, 1, 36)}
-len(cluster1)=1
-len(cluster2)=34
 {27340: (0.9375, 15, 16)}
 len(cluster1)=1
 len(cluster2)=14
-{28259: (0.98, 49, 50), 42829: (0.3333333333333333, 2, 6)}
-len(cluster1)=49
-len(cluster2)=2
-{29592: (0.972972972972973, 36, 37)}
-len(cluster1)=1
-len(cluster2)=35
 {30146: (0.9795918367346939, 48, 49), 34826: (0.22, 11, 50)}
-len(cluster1)=11
-len(cluster2)=48
+len(cluster1)=48
+len(cluster2)=11
 {30670: (0.9705882352941176, 33, 34), 40434: (0.1794871794871795, 7, 39)}
 len(cluster1)=7
 len(cluster2)=33
-{31023: (0.038461538461538464, 1, 26), 44059: (1.0, 16, 16)}
-len(cluster1)=1
-len(cluster2)=16
-{31459: (1.0, 16, 16)}
-len(cluster1)=15
+{33305: (0.05555555555555555, 1, 18), 34568: (0.92, 23, 25)}
+len(cluster1)=23
 len(cluster2)=1
-{32730: (0.9459459459459459, 35, 37), 37714: (0.07692307692307693, 1, 13)}
-len(cluster1)=35
+{35584: (1.0, 35, 35)}
+len(cluster1)=34
 len(cluster2)=1
-{37170: (1.0, 15, 15), 43645: (0.025, 1, 40)}
-len(cluster1)=15
-len(cluster2)=1
-{37291: (0.2727272727272727, 6, 22), 44643: (0.9791666666666666, 47, 48)}
-len(cluster1)=47
-len(cluster2)=6
 {37369: (1.0, 39, 39), 45580: (0.13793103448275862, 4, 29)}
 len(cluster1)=4
 len(cluster2)=39
-{37825: (0.05263157894736842, 1, 19), 43918: (0.9696969696969697, 32, 33)}
-len(cluster1)=32
-len(cluster2)=1
-{39589: (1.0, 25, 25)}
-len(cluster1)=24
-len(cluster2)=1
-{42546: (1.0, 46, 46), 49878: (0.029411764705882353, 1, 34)}
-len(cluster1)=46
+{40599: (0.09375, 3, 32), 49419: (1.0, 12, 12)}
+len(cluster1)=12
+len(cluster2)=3
+{44174: (0.9722222222222222, 35, 36), 45415: (0.037037037037037035, 1, 27)}
+len(cluster1)=35
 len(cluster2)=1
 {47999: (1.0, 42, 42), 48505: (0.35, 7, 20)}
 len(cluster1)=7
 len(cluster2)=42
-count_wrong=40
+count_wrong=38
 count_right=49
 
 
@@ -135,17 +129,17 @@ acc_ver_0 = 0.4780
 
 summery:
 The total number of unwanted unions is 10
-The total number of unwanted singletons is 28488
-The total number of clusters with unwanted rebellious reads is 262
-The avg size of unwanted rebellious reads in a cluster is 1.3931
+The total number of unwanted singletons is 28481
+The total number of clusters with unwanted rebellious reads is 259
+The avg size of unwanted rebellious reads in a cluster is 1.3552
 
-acc_ver_1_5 = 0.4789
+acc_ver_1_5 = 0.4791
 
 summery:
 The total number of unwanted unions is 14
-The total number of unwanted singletons is 3131
-The total number of clusters with unwanted rebellious reads is 307
-The avg size of unwanted rebellious reads in a cluster is 1.4007
+The total number of unwanted singletons is 2779
+The total number of clusters with unwanted rebellious reads is 312
+The avg size of unwanted rebellious reads in a cluster is 1.3686
 
-acc_ver_4 = 0.7781
+acc_ver_4 = 0.7829
 
