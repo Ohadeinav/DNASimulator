@@ -69,7 +69,11 @@ def file_to_clustering(file_path):
 
 
 def hash_fun(x, a, w, l):
-    """ An implementation of the hash function from the article section 3.2"""
+    """
+    An implementation of the hash function from the article section 3.2.
+    It finds the first occurrence of substring a in x and return the substring in x that starts
+    with the starting index of a and its length is w + l.
+    """
     # assume that x has substring a
     # but what happens if it return -1???
     ind = x.find(a)
@@ -152,6 +156,9 @@ def min_max(val1, val2):
 
 
 def condition0(bin_sig_arr, hash_C_til, id1, read1, read2, th_low, th_high, r, index_size=0):
+    """
+    The original condition in the algorithm for merging two clusters
+    """
     return (((ham_dis(bin_sig_arr[hash_C_til[id1][0]], bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_low) or
              ((ham_dis(bin_sig_arr[hash_C_til[id1][0]],
                        bin_sig_arr[hash_C_til[id1 + 1][0]]) <= th_high) and
@@ -987,8 +994,20 @@ def handle_singletons_with_index_ver5(algo_clustering, orig_cluster_info, bin_si
     return [sorted(x) for x in algo_clustering_copy if x != []], ''
 
 
-def find_best_cluster(c_til, singleton_id, singleton_cluster_id, candidates_ids, reads_err,
+def find_best_cluster(singleton_id, singleton_cluster_id, candidates_ids, reads_err,
                       clusters_reps, bin_sign_arr, index_size=6):
+    """
+    An auxiliary for the handle_singletons function.
+
+    :return: The cluster id of the most likely cluster to be the origin of the given singleton.
+    :param singleton_id: The singleton whom we want to get his origin cluster.
+    :param singleton_cluster_id: The singleton cluster id in case we don't find a good origin cluster.
+    :param candidates_ids: List of all the clusters ids which are candidates to be the singleton origin cluster.
+    :param reads_err: mapping from read_id (int) to the actual read (string).
+    :param clusters_reps: A dict of the form: {cluster_id: list of representatives ids for this cluster}
+    :param bin_sign_arr: The binary signatures of all the reads. bin_sign_arr[i] = the signature of the read with id=i.
+    :param index_size: The number of symbols dedicated for the read's index.
+    """
     best_cluster_id = singleton_cluster_id
     # First filter
     candidates_ids = [c for c in candidates_ids if c != singleton_cluster_id]
@@ -1004,10 +1023,13 @@ def find_best_cluster(c_til, singleton_id, singleton_cluster_id, candidates_ids,
         # true candidates:
         min_ham = min(compare)
         min_ham_cluster_id = candidates_ids[np.argmin(compare)]
+        # condition for not good enough candidates:
         if not (min_ham <= 95
                 or (edit_dis(clusters_reps[min_ham_cluster_id][1], reads_err[singleton_id][: index_size]) <= 1
                     and min_ham <= 90)):
             return singleton_cluster_id
+
+        # otherwise there are good candidates:
         true_candidates = [cluster_id for index, cluster_id in enumerate(candidates_ids) if compare[index] <= min_ham + 6]
         true_candidates_compare = [compare[index] for index, cluster_id in enumerate(candidates_ids) if compare[index] <= min_ham + 6]
         true_candidates_sizes.append(len(true_candidates))
@@ -1029,9 +1051,27 @@ def find_best_cluster(c_til, singleton_id, singleton_cluster_id, candidates_ids,
 
 
 def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_sign_arr, index_size,
-                                        threshold=10, num_epochs=2, num_of_hashes=20,
-                                        return_stats=False, converge=False,
-                                        convergence_param=10, convergence_ratio=0.8):
+                                        threshold=10, num_of_hashes=20, num_epochs=2,
+                                        converge=False, convergence_param=10,
+                                        convergence_ratio=0.8, return_stats=False):
+    """
+    :return: clustering after handling singletons for a given clustering.
+    :param algo_clustering: The clustering we want to improve. Should be list of lists.
+    :param orig_cluster_info: Used both for stats and for maps between read ids to the actual reads.
+    :param bin_sign_arr: The binary signature array that relates to the reads and is constant for those reads.
+    :param index_size: The number of symbols dedicate for indexing.
+    :param threshold: The maximum number of representatives we sample from each cluster. Default to 10.
+    :param num_of_hashes: The number of different hash functions to use. Default to 20.
+    :param num_epochs: The number of iterations to preform. Default to 2.
+    :param converge: True if you want to run iterations until convergence (we don't handle a lot singletons).
+        Default to False
+    :param convergence_param: Used only if converge=True. Stop the iterations if we handled less than convergence_param
+        singletons in the last iteration. Default to 10.
+    :param convergence_ratio: Used only if converge=True. Stop the iterations if after the current iteration we remains
+        with more than convergence_ratio singletons from the previous iteration. Default to 0.8.
+    :param return_stats: If true, we also return the number of unwanted singletons at each epoch and the time it took
+        for each epoch in minutes. Default to False.
+    """
     algo_clustering_copy = copy.deepcopy(algo_clustering)
     times_for_each_epoch = [0]
     ########################################################################
@@ -1044,7 +1084,6 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
                                  # Meaning sees only the algo clustering and not the real clustering.
     epoch_id = 0
     while epoch_id < num_epochs or converge:
-        # print(f"epoch: {epoch_id}")
         start = time.perf_counter_ns()
         reads_err = orig_cluster_info.reads_err
         stat1, stat2 = find_clusters_stats(algo_clustering_copy, orig_cluster_info)
@@ -1074,25 +1113,23 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
                         hash_dict[hash_value] = {'cluster_ids': [],
                                                  'singletons_ids': [singleton_id]}
 
-                    # if singleton_id in candidates[str_sub_sign]:
-                    #     candidates[str_sub_sign][singleton_id] += 1
-                    # else:
-                    #     candidates[str_sub_sign][singleton_id] = 1
+        # meaning it's the first iteration.
         if number_of_singletons is None:
             number_of_singletons = len(singletons)
             print(f'number of singletons before: {number_of_singletons}')
+        # convergence:
         elif converge and (number_of_singletons - len(singletons) <= convergence_param
                            or len(singletons)/number_of_singletons > convergence_ratio):
-            print(f'converge after {epoch_id} epochs')
+            number_of_singletons = len(singletons)
             break
+        # regular epoch:
         else:
             number_of_singletons = len(singletons)
             print(f'number of singletons after {epoch_id} epochs: {number_of_singletons}')
-        # print(f"there are {len(singletons)} singletons")
+
         # find clusters reps and their index:
         clusters_reps = {}
         for cluster_id, cluster in enumerate(algo_clustering_copy):
-            # candidates[cluster_id] = {}
             true_index = []
             representatives = random.sample(cluster, min([threshold, len(cluster)]))
             index_mat = np.array([list(reads_err[read][:index_size]) for read in representatives]).T
@@ -1113,8 +1150,9 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
                             else:
                                 candidates[singleton_id][cluster_id] = 1
 
+        # iterate over all the candidates for each singleton:
         for singleton_id, singleton_cluster_id in singletons:
-            cluster_id = find_best_cluster(algo_clustering_copy, singleton_id, singleton_cluster_id,
+            cluster_id = find_best_cluster(singleton_id, singleton_cluster_id,
                                            list(candidates[singleton_id].keys()), reads_err, clusters_reps,
                                            bin_sign_arr, index_size)
             if cluster_id != singleton_cluster_id:
@@ -1130,42 +1168,51 @@ def handle_singletons_with_index_ver5_5(algo_clustering, orig_cluster_info, bin_
 
         epoch_id += 1
 
+    print(f'number of singletons after {epoch_id} epochs: {number_of_singletons}')
+    if converge:
+        print(f'converge after {epoch_id} epochs')
     if return_stats:
         return [sorted(x) for x in algo_clustering_copy if x != []], '',\
                num_of_remaining_singletons, times_for_each_epoch
     return [sorted(x) for x in algo_clustering_copy if x != []], ''
 
 
-def separate_cluster(cluster, orig_cluster_info, bin_sign_arr, index_size, threshold=100):
-    # hoping that in 4 random reps we'll get at least one rep from each cluster
-    reads_err = orig_cluster_info.reads_err
-    n = min([10, len(cluster)])
+def separate_cluster(cluster, bin_sign_arr, threshold=10):
+    """
+    An auxiliary function for the handle_unions function.
+
+    :return: If we think the given cluster is union of clusters then tuple of two disjoint clusters
+        s.t. C1 union C2 = the given cluster. Otherwise, tuple of two None i.e. (None, None)
+    :param cluster: The cluster id of the suspect to be a union of clusters.
+    :param bin_sign_arr: The binary signature array that relates to the reads and is constant for those reads.
+    :param threshold: The maximum number of representatives we sample from each cluster. Default to 10.
+    """
+    # finding cluster representatives:
+    n = min([threshold, len(cluster)])
     reps = random.sample(cluster, n)
+    # calculate the reps hamming distance from one another:
     ham_dist_matrix = np.zeros((n, n))
-    # edit_dist_matrix = np.zeros((n, n))
     for i in range(n):
         for j in range(n):
-            # edit_dist_matrix[i][j] = edit_dis(reads_err[reps[i]][:index_size], reads_err[reps[j]][:index_size])
             ham_dist_matrix[i][j] = ham_dis(bin_sign_arr[reps[i]], bin_sign_arr[reps[j]])
-    # edi, edj = np.unravel_index(edit_dist_matrix.argmax(), edit_dist_matrix.shape)
+
+    # find the two reads that are farthest from each other
     hami, hamj = np.unravel_index(ham_dist_matrix.argmax(), ham_dist_matrix.shape)
+
+    # finding the minimum hamming distance from the two read we found:
     ham_within_cluster_1 = min([ham_j for j, ham_j in enumerate(ham_dist_matrix[hami]) if hami != j])
     ham_within_cluster_2 = min([ham_i for i, ham_i in enumerate(ham_dist_matrix[hamj]) if hamj != i])
-    # mean_ham = np.mean([i for i in ham_dist_matrix.reshape(-1) if i != 0])
-    # print(f'{mean_ham=}')
-    # print(f'{edit_dist_matrix[edi][edj]=}')
-    # print(f'{ham_dist_matrix[hami][hamj]=}')
-    # print(f"{(ham_dist_matrix[hami][hamj] - ham_within_cluster_1)=}")
+
     diff1 = ham_dist_matrix[hami][hamj] - ham_within_cluster_1
     diff2 = ham_dist_matrix[hami][hamj] - ham_within_cluster_2
+
+    # if the condition is true it means that the cluster is probably not a union of clusters.
     if ham_dist_matrix[hami][hamj] < 115 or diff1 < 30 or diff2 < 30:
         return None, None
-    # if edit_dist_matrix[edi][edj] >= 3:
-    #     cluster1 = [reps[edi]]
-    #     cluster2 = [reps[edj]]
-    # else:
+
     cluster1 = [reps[hami]]
     cluster2 = [reps[hamj]]
+    # separate the cluster to two clusters based on the hamming distances we computed earlier:
     for read_id in cluster:
         if read_id != reps[hami] and read_id != reps[hamj]:
             ham1 = ham_dis(bin_sign_arr[cluster1[0]], bin_sign_arr[read_id])
@@ -1174,7 +1221,8 @@ def separate_cluster(cluster, orig_cluster_info, bin_sign_arr, index_size, thres
                 cluster1.append(read_id)
             else:
                 cluster2.append(read_id)
-    # To be sure:
+
+    # check that the two cluster we created are really not suppose to be in the same cluster:
     dists_inside_cluster1 = []
     for i in range(len(cluster1)):
         for j in range(i + 1, len(cluster1)):
@@ -1200,6 +1248,15 @@ def separate_cluster(cluster, orig_cluster_info, bin_sign_arr, index_size, thres
 
 
 def handle_unions(algo_clustering, orig_cluster_info, bin_sign_arr, index_size, threshold=10, log=True):
+    """
+    :return: clustering after handling unions for a given clustering.
+    :param algo_clustering: The clustering we want to improve. Should be list of lists.
+    :param orig_cluster_info: Used both for stats and for maps between read ids to the actual reads.
+    :param bin_sign_arr: The binary signature array that relates to the reads and is constant for those reads.
+    :param index_size: The number of symbols dedicate for indexing.
+    :param threshold: The maximum number of representatives we sample from each cluster. Default to 10.
+    :param log: If True return also a string containing the log of this function. Default to True.
+    """
     avg_cluster_size = sum([len(cluster) for cluster in algo_clustering])/len(algo_clustering)
     count_wrong = 0
     count_right = 0
@@ -1210,14 +1267,12 @@ def handle_unions(algo_clustering, orig_cluster_info, bin_sign_arr, index_size, 
     # for checks only
     stats1, stats2 = find_clusters_stats(algo_clustering, orig_cluster_info)
     unwanted_unions = find_unwanted_unions(stats1)
-    # print(avg_cluster_size)
     for cluster_id, cluster in enumerate(algo_clustering):
         if len(cluster) >= avg_cluster_size:
-            cluster1, cluster2 = separate_cluster(cluster, orig_cluster_info, bin_sign_arr, index_size, threshold=100)
+            cluster1, cluster2 = separate_cluster(cluster, bin_sign_arr, index_size, threshold=threshold)
             if cluster1 is not None:
                 sep_dict[cluster_id] = (cluster1, cluster2)
                 if cluster_id in unwanted_unions:
-                    # print(unwanted_unions[cluster_id])
                     count_right += 1
                 else:
                     log_str += f"{stats1[cluster_id]}\n"
@@ -1237,11 +1292,11 @@ def arrange_clustering(algo_clustering, orig_cluster_info):
     """
     Arrange the output of the clustering algorithm so that the order of the clusters
     and the original strands will be similar to the original (true) clustering.
-    | Args:
-    |   algo_clustering: The output from the clustering algorithm.
-    |   orig_cluster_info: all the known information on the true clustering.
-    |                      It should be ClusteringInfo object.
-    Returns the evyat format string of the arranged clustering.
+
+    :param algo_clustering: The output from the clustering algorithm.
+    :param orig_cluster_info: all the known information on the true clustering.
+        It should be ClusteringInfo object.
+    :return: the evyat format string of the arranged clustering.
     """
     res = ''
     for cluster in algo_clustering:
@@ -1258,8 +1313,9 @@ def arrange_clustering(algo_clustering, orig_cluster_info):
 
 
 def file_to_cluster(file_path):
-    """ return a clustering from a file as a dict
-    |   where the keys are cluster id and the value in a list of all the reads (strings) that are in the cluster.
+    """
+    :return: A clustering from a file as a dict
+        where the keys are cluster id and the value in a list of all the reads (strings) that are in the cluster.
     """
     strand_id = 0
     cluster = {}
@@ -1282,9 +1338,14 @@ def file_to_cluster(file_path):
 
 
 def algo_clustering_to_file_aux(input_path, index_size):
+    """
+    An auxiliary function for the algo_clustering_to_file function.
+
+    :param input_path: The full or relative path to an inputs reads file.
+    :param index_size: The number of symbols dedicate for indexing.
+    """
     input_file_name = input_path[input_path.rfind("/"):]
-    output_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
-    # output_path = "files/minion_idt/15000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result_shuffled.txt")
+    output_path = "files/minion_idt/100000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
     clustering_info = ClusteringInfo(file_path=input_path)
     C_til, bin_sig_arr = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
     print(C_til[0])
@@ -1299,7 +1360,12 @@ def algo_clustering_to_file_aux(input_path, index_size):
 
 
 def algo_clustering_to_file(index_size):
-    input_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat0_index.txt"
+    """
+    Saving clustering into file.
+
+    :param index_size: The number of symbols dedicate for indexing.
+    """
+    input_path = "files/minion_idt/100000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
     for i in range(5):
         # if i != 4:
         if True:
@@ -1308,6 +1374,10 @@ def algo_clustering_to_file(index_size):
 
 
 def file_to_algo_clustering(path):
+    """
+    :return: Tuple containing clustering (list of lists) and binary signature array.
+    :param path: The full or relative path to a clustering file.
+    """
     clustering = []
     bin_sig_arr = []
     cluster_id = 0
@@ -1334,6 +1404,12 @@ def file_to_algo_clustering(path):
 
 
 def from_no_index_to_index_via_indices_file(indices_file_path, input_strands_file_path):
+    """
+    Merge input file with indices file to compose indexed input.
+
+    :param indices_file_path: The full or relative path to an indices file.
+    :param input_strands_file_path: The full or relative path to an inputs reads file.
+    """
     with open(indices_file_path, 'r', newline='\n') as ind_file:
         index_line = ind_file.readline().rstrip()
         index_size = len(index_line)

@@ -82,6 +82,16 @@ def find_clusters_stats(algo_clustering, orig_cluster_info):
 
 
 def stats_to_str_dict(stats1):
+    """
+    Convert the stats to nice dict format.
+
+    | param stats1: {index of the algo cluster: value}
+    |      Where value is a dict:
+    |           {id_of_origin_strand: tuple
+    |           #element1: The ratio between the next two
+    |           #element2: Number of reads that originated from this origin strand
+    |           #element3: Size of the origin strand true cluster}
+    """
     str_summery = 'summery:\n'
 
     # union:
@@ -211,6 +221,9 @@ def find_unwanted_rebellious_reads(stats, gamma=0.5):
 
 
 def understanding_singletons():
+    """
+    investigate singletons behavior.
+    """
     file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
     result_path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
     clustering_info = ClusteringInfo(file_path=file_path)
@@ -280,6 +293,9 @@ def understanding_singletons():
 
 
 def understanding_unions():
+    """
+    investigate unions behavior.
+    """
     file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
     result_path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
     clustering_info = ClusteringInfo(file_path=file_path)

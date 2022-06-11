@@ -6,6 +6,9 @@ import time
 
 
 def test_jaccard():
+    """
+    test the Jaccard distance function.
+    """
     s1, _ = gen_rand_input(6, 1)
     s2, _ = gen_rand_input(6, 1)
     # s1 = ['ATAACGAATT']
@@ -19,6 +22,9 @@ def test_jaccard():
 
 
 def test_gen_rand_input():
+    """
+    test gen_rand_input function
+    """
     res, str0 = gen_rand_input(100, 5, "input/strands_in01.txt")
     for i in range(len(res)):
         print(f'strand {i}:')
@@ -28,17 +34,26 @@ def test_gen_rand_input():
 
 
 def test_decimal_to_dna_str():
+    """
+    test decimal_to_dna_str function
+    """
     for i in range(20):
         print(f'{i} -> {decimal_to_dna_str(i)}')
 
 
 def test_reg_index():
+    """
+    test RegIndex class
+    """
     index = RegIndex(4)
     for i in range(int(math.pow(4, 4))):
         print(f'{i} -> {index.next()}')
 
 
 def test_time_functions():
+    """
+    exploring different types of time libs
+    """
     s = time.time_ns()
     _s = timeit.default_timer()
     __s = time.perf_counter_ns()
@@ -53,6 +68,13 @@ def test_time_functions():
 
 
 def time_function(func, **kwargs):
+    """
+    :return: A dict containing the elapsed time
+        it took to run the given function
+        in different unit of measurement: ns, sec, minutes.
+    :param func: The function which we want to time.
+    :param kwargs: Arguments to pass to the func param.
+    """
     start = time.perf_counter_ns()
     func_result = func(**kwargs)
     end = time.perf_counter_ns()
@@ -63,6 +85,9 @@ def time_function(func, **kwargs):
 
 
 def test_time_and_accuracy_with_index():
+    """
+    measures the time and accuracies of some clustering for different values of gamma.
+    """
     origin_file_path = "files/minion_idt/3000 strands in size 150 with x1.5 errors and cluster avg of 40/evyat0.txt"
     start = time.perf_counter_ns()
     for i in range(0, 10):
@@ -132,6 +157,9 @@ def test_time_and_accuracy_with_index():
 
 
 def test_file_to_algo_clustering():
+    """
+    test the file_to_algo_clustering function.
+    """
     path = "files/minion_idt/algo_results/evyat00_index_algo_result.txt"
     clustering, bin_sig_arr = file_to_algo_clustering(path)
     print(f'{clustering[0]=}')
@@ -140,6 +168,19 @@ def test_file_to_algo_clustering():
 
 def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=True,
                file_path=None, algo_result_path=None, index_size=0, gamma=0.99):
+    """
+    get stats and accuracy for algo clustering, after unions handling and after singletons handling.
+
+    :return: str log containing stats.
+    :param unions: Whether or not to return the unions full stats. Default False.
+    :param singletons: Whether or not to return the singletons full stats. Default False.
+    :param rebellious_reads: Whether or not to return the rebellious_reads full stats. Default False.
+    :param summery: Whether or not to return the summery stats. Default True.
+    :param file_path: The path to an evyat file. Default to None.
+    :param algo_result_path: The path to an clustering file. Default to None.
+    :param index_size: The number of symbols dedicate for indexing. Default to 0.
+    :param gamma: The gamma parameter to pass to the accuracy function. Default to 0.99.
+    """
     # file_path = "files/minion_idt/3000 strands in size 150 with x2 errors and cluster avg of 40/evyat00_index.txt"
     if file_path is None:
         file_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat00_index.txt"
@@ -151,7 +192,8 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
     # C_til2, singletons_log = handle_singletons_with_index_ver2_5(copy.deepcopy(C_til1_5), clustering_info, bin_sig_arr, index_size=index_size, threshold=12)
     # C_til3 = handle_singletons_with_index_ver3(copy.deepcopy(C_til), clustering_info, index_size=index_size, threshold=100)
     C_til4, singletons_log = handle_singletons_with_index_ver5_5(copy.deepcopy(C_til1_5), clustering_info, bin_sig_arr,
-                                                                 index_size=index_size, threshold=10, num_epochs=4)
+                                                                 index_size=index_size, threshold=10, num_epochs=4,
+                                                                 converge=True)
 
     str_log = f'{unions_log}\n{singletons_log}\n'
 
@@ -195,6 +237,13 @@ def test_stats(unions=False, singletons=False, rebellious_reads=False, summery=T
 
 
 def test_handle_singletons(index_size=6, log=True, to_print=True):
+    """
+    running the test_stats function on multiple files.
+
+    :param index_size: The number of symbols dedicate for indexing. Default to 6.
+    :param log: Whether or not to save the log in files. Default to True.
+    :param to_print: Whether or not to print the log to screen. Default to True.
+    """
     file_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat0_index.txt"
     algo_result_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/algo_results/evyat0_index_algo_result.txt"
     log_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/stats files/stats0.txt"
@@ -214,13 +263,21 @@ def test_handle_singletons(index_size=6, log=True, to_print=True):
             print(res)
 
 
-def test_times(log=True, log_each_file=True, index_size=6, save=False):
+def test_times(log=True, log_each_file=True, index_size=6):
+    """
+    Check times for pipe line of functions.
+
+    :return: The time stats string.
+    :param log: Whether or not to save all the logs in a single file. Default to True.
+    :param log_each_file: Whether or not to save the log for each file in a different file.
+        Default to True.
+    :param index_size: The number of symbols dedicate for indexing. Default to 6.
+    """
     file_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat0_index.txt"
     algo_result_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/algo_results/evyat0_index_algo_result.txt"
     log_path_each_file = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/stats files/times0.txt"
     log_path = "files/minion_idt/50000 strands in size 150 with x2 errors and cluster avg of 25/time stats_ver5_5.txt"
-    # log = False
-    # log_each_file = True
+
     # functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver2_5_clean]
     functions_to_check = [hash_based_cluster, handle_unions, handle_singletons_with_index_ver5_5]
 
@@ -285,7 +342,7 @@ def main():
     # create_inputs(strand_len=150, num_of_strands=9000)
     # test_time_functions()
     # test_time_and_accuracy_with_index()
-    # algo_clustering_to_file(index_size=8)
+    algo_clustering_to_file(index_size=9)
     # test_file_to_algo_clustering()
     # no_indices_file_path = "input/3000 strands in size 150/strand_in00.txt"
     # indices_file_path = "input/special indices/indices.txt"
@@ -294,7 +351,7 @@ def main():
     # print(test_stats())
     # understanding_singletons()
     # understanding_unions()
-    test_handle_singletons(index_size=8, log=True)
+    # test_handle_singletons(index_size=8, log=True)
     # test_times(True, True, index_size=8)
 
 

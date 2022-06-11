@@ -67,6 +67,14 @@ class IndexStride(RegIndex):
 
 
 def create_input(file_path, strand_len=150, num_of_strands=1024, index=None):
+    """
+    Create input file.
+
+    :param file_path: The full or relative path in which to save the input file we create.
+    :param strand_len: The length of each strand. Default to 150.
+    :param num_of_strands: The number of strands/clusters wanted. Default to 1024.
+    :param index: An object of index class implemented next method. Default to None.
+    """
     strand_list, origin = gen_rand_input(strand_len, num_of_strands)
     index = RegIndex(math.ceil(math.log(num_of_strands, 4)))
     res_str = ''
@@ -84,6 +92,12 @@ def create_input(file_path, strand_len=150, num_of_strands=1024, index=None):
 
 
 def create_inputs(strand_len=150, num_of_strands=1024):
+    """
+        Create 10 inputs file with regular indices.
+
+        :param strand_len: The length of each strand. Default to 150.
+        :param num_of_strands: The number of strands/clusters wanted. Default to 1024.
+        """
     origin_file_path = "input/strand_in0.txt"
     for i in range(10):
         file_path = origin_file_path.replace('in0', f'in0{i}')
