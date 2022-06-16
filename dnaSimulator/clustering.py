@@ -1269,7 +1269,7 @@ def handle_unions(algo_clustering, orig_cluster_info, bin_sign_arr, index_size, 
     unwanted_unions = find_unwanted_unions(stats1)
     for cluster_id, cluster in enumerate(algo_clustering):
         if len(cluster) >= avg_cluster_size:
-            cluster1, cluster2 = separate_cluster(cluster, bin_sign_arr, index_size, threshold=threshold)
+            cluster1, cluster2 = separate_cluster(cluster, bin_sign_arr, threshold=threshold)
             if cluster1 is not None:
                 sep_dict[cluster_id] = (cluster1, cluster2)
                 if cluster_id in unwanted_unions:
@@ -1345,7 +1345,7 @@ def algo_clustering_to_file_aux(input_path, index_size):
     :param index_size: The number of symbols dedicate for indexing.
     """
     input_file_name = input_path[input_path.rfind("/"):]
-    output_path = "files/minion_idt/100000 strands in size 150 with x2 errors and cluster avg of 40/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
+    output_path = "files/minion_idt/100000 strands in size 150 with x2 errors and cluster avg of 25/algo_results" + input_file_name.replace(".txt", "_algo_result.txt")
     clustering_info = ClusteringInfo(file_path=input_path)
     C_til, bin_sig_arr = hash_based_cluster(clustering_info.reads_err, index_size=index_size)
     print(C_til[0])
@@ -1365,7 +1365,7 @@ def algo_clustering_to_file(index_size):
 
     :param index_size: The number of symbols dedicate for indexing.
     """
-    input_path = "files/minion_idt/100000 strands in size 150 with x2 errors and cluster avg of 40/evyat files/evyat0_index.txt"
+    input_path = "files/minion_idt/100000 strands in size 150 with x2 errors and cluster avg of 25/evyat files/evyat0_index.txt"
     for i in range(5):
         # if i != 4:
         if True:
